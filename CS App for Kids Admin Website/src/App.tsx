@@ -9,17 +9,45 @@ function App() {
   return (
     <>
       <h1>Welcome to Citizen Science App for Kids</h1>
-      <div id='login'>
-        <form>
-          <label form='username'>Username: </label>
-          <input type='text' id='username' name='username'></input><br/>
-          <label form='password'>Password: </label>
-          <input type='text' id='password' name='password'></input><br/>
-          <input type='button' value={'submit'} id='submit' name='submit'></input>
-        </form>
-      </div>
+      <form action='https://accounts.google.com/o/oauth2/v2/auth'>
+        <button type='submit' id='login-button'>Login with Google</button>
+      </form>
     </>
   )
+}
+
+/*
+ * Create form to request access token from Google's OAuth 2.0 server.
+ */
+function oauthSignIn() {
+  // Google's OAuth 2.0 endpoint for requesting an access token
+  var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+  // Create <form> element to submit parameters to OAuth 2.0 endpoint.
+  var form = document.createElement('form');
+  form.setAttribute('method', 'GET'); // Send as a GET request.
+  form.setAttribute('action', oauth2Endpoint);
+
+  // Parameters to pass to OAuth 2.0 endpoint.
+  var params = {'client_id': 'YOUR_CLIENT_ID',
+                'redirect_uri': 'YOUR_REDIRECT_URI',
+                'response_type': 'token',
+                'scope': 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/calendar.readonly',
+                'include_granted_scopes': 'true',
+                'state': 'pass-through value'};
+
+  // Add form parameters as hidden input values.
+  for (var p in params) {
+    var input = document.createElement('input');
+    input.setAttribute('type', 'hidden');
+    input.setAttribute('name', p);
+    input.setAttribute('value', p);
+    form.appendChild(input);
+  }
+
+  // Add form to page and submit it to open the OAuth 2.0 endpoint.
+  document.body.appendChild(form);
+  form.submit();
 }
 
 function ProjectList() {
