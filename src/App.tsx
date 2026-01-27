@@ -74,9 +74,9 @@ function ProjectList() {
           <td>Code</td>
         </tr>
         <tr>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td>test</td>
+          <td>test</td>
+          <td>test</td>
         </tr>
       </table>
     </div>
@@ -120,8 +120,8 @@ function ProjectResults() {
           <td>Observation</td>
         </tr>
         <tr>
-          <td></td>
-          <td></td>
+          <td>test</td>
+          <td>test</td>
         </tr>
       </table>
       <button>Create Me a Graph</button>
