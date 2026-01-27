@@ -1,11 +1,7 @@
-//import { useState } from 'react'
-//import reactLogo from './assets/react.svg'
-//import viteLogo from '/vite.svg'
 import './App.css' 
 
-function App() {
-  //const [count, setCount] = useState(0)
-
+function Login() {
+  /* Returns the html for the login page */
   return (
     <>
       <h1>Welcome to Citizen Science App for Kids</h1>
@@ -17,7 +13,7 @@ function App() {
 }
 
 /*
- * Create form to request access token from Google's OAuth 2.0 server.
+ * Create form to request access token from Google's OAuth 2.0 server. - Plan to set this up next sprint
  */
 function oauthSignIn() {
   // Google's OAuth 2.0 endpoint for requesting an access token
@@ -51,6 +47,7 @@ function oauthSignIn() {
 }
 
 function ProjectList() {
+  /* Returns the html for the project list page. */
   return (
     <>
     <h1>Projects</h1>
@@ -73,6 +70,7 @@ function ProjectList() {
 }
 
 function NewProject() {
+  /* Returns the html for the new project page. */
   return (
     <>
     <h1>Create a Project</h1>
@@ -95,6 +93,7 @@ function NewProject() {
 }
 
 function ProjectResults() {
+  /* Returns the html for the project results page. */
   return (
     <>
     <h1>Project Results</h1>
@@ -117,4 +116,4 @@ function ProjectResults() {
   )
 }
 
-export {App, ProjectList, NewProject, ProjectResults};
+export {Login, ProjectList, NewProject, ProjectResults};
