@@ -59,3 +59,11 @@ button {
   max-width: 600px;
   margin-left: 25px;
 }
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid black;
+}
