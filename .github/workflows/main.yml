@@ -6,8 +6,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install modules
-      working-directory: '../../CS-App-For-Kids-Admin-Website'
       run: npm install
     - name: run lint
       run: eslint . --ext .js,.jsx,.ts,.tsx
-      working-directory: '../CS App For Kids Admin Website/'
