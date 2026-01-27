@@ -4,10 +4,25 @@ function Login() {
   /* Returns the html for the login page */
   return (
     <>
-      <h1>Welcome to Citizen Science App for Kids</h1>
-      <form action='https://accounts.google.com/o/oauth2/v2/auth'>
-        <button type='submit' id='login-button'>Login with Google</button>
-      </form>
+      <h1>Citizen Science App for Kids</h1>
+      <div id='home-page'>
+        <div id='login-box'>
+          <form action='https://accounts.google.com/o/oauth2/v2/auth'>
+            <button type='submit' id='login-button'>Login with Google</button>
+          </form>
+          <p>------------------OR-------------------</p>
+          <form action='https://accounts.google.com/o/oauth2/v2/auth'>
+            <button type='submit' id='sign-up-button'>Create an Account</button>
+          </form>
+        </div>
+        <div id='welcome-box'>
+          <h2>Welcome!</h2>
+          <p>This is the administrative website for the app Citizen Science App for Kids, an app where students of all 
+            ages can record observations for citizen science projects. This website is where teachers can manage their 
+            student's projects and view their observations. Log in with Google or create an account to get started!
+          </p>
+        </div>
+      </div>
     </>
   )
 }

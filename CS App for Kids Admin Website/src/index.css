@@ -33,6 +33,11 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  margin-bottom: 50px;
+}
+
+h2 {
+  margin-top: 0px;
 }
 
 button {
@@ -46,6 +51,25 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+#home-page {
+  display: flex;
+}
+
+#login-box {
+  border: 1px solid black;
+  width: 40%;
+  min-width: 260px;
+  height: 150px;
+  margin: 0 auto 50px auto;
+  padding: 18px 10px;
+}
+
+#welcome-box {
+  max-width: 600px;
+  margin-left: 25px;
+}
+
 /*button:hover {
   border-color: #646cff;
 }
