@@ -9,7 +9,7 @@ jobs:
       run: |
         cd ../
         cd ../
-        cd 'CS App for Kids Admin Website'
+        cd "CS App for Kids Admin Website"
         npm install
     - name: run lint
       run: eslint . --ext .js,.jsx,.ts,.tsx
