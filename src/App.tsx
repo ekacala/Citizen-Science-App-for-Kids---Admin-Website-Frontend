@@ -74,9 +74,9 @@ function ProjectList() {
           <td>Code</td>
         </tr>
         <tr>
-          <td>test</td>
-          <td>test</td>
-          <td>test</td>
+          <td>Bee Observation</td>
+          <td>Record the number of bees spotted in the field next to the school for 1 week.</td>
+          <td>7ABD3</td>
         </tr>
       </table>
     </div>
@@ -117,11 +117,28 @@ function ProjectResults() {
       <table id='project-results-table'>
         <tr>
           <td>Student</td>
-          <td>Observation</td>
+          <td>Day of the Week</td>
+          <td>Number of Bees</td>
         </tr>
         <tr>
-          <td>test</td>
-          <td>test</td>
+          <td>Jimmy</td>
+          <td>Monday</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>Kim</td>
+          <td>Monday</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>Jimmy</td>
+          <td>Tuesday</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Kim</td>
+          <td>Tuesday</td>
+          <td>5</td>
         </tr>
       </table>
       <button>Create Me a Graph</button>
