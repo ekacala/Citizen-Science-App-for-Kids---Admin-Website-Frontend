@@ -1,7 +1,8 @@
 import './App.css' 
-import { getAccessToken, oauthSignIn } from './components/SignIn'
+import { oauthSignIn } from './components/SignIn'
 import { addProject, exitAddProject, logoutAccount } from './components/navigation'
 import { dropdownMenu } from './components/menu'
+import { GetProjectList } from './components/server_calls'
 
 import menuButton from './assets/menu-icon.svg'
 
@@ -36,6 +37,7 @@ function Login() {
 
 function ProjectList() {
   /* Returns the html for the project list page.*/
+  GetProjectList()
   return (
     <>
     <div id='menu'>
