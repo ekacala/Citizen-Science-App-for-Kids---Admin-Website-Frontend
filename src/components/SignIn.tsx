@@ -1,6 +1,4 @@
 import { YOUR_CLIENT_ID, YOUR_REDIRECT_URI } from "../secrets"
-import { useLocation } from 'react-router'
-import { jwtDecode } from 'jwt-decode'
 
 // * Create form to request access token from Google's OAuth 2.0 server.
 function oauthSignIn() {
@@ -34,22 +32,4 @@ function oauthSignIn() {
     form.submit();
 }
 
-function getAccessToken() {
-    const location = useLocation()
-  
-    const hash = location.hash
-
-    const parsedHash = new URLSearchParams(hash)
-    const accessToken = parsedHash.get('access_token')
-    console.log(hash)
-    if (accessToken) {
-        decodeJWT(accessToken)
-    }
-}
-
-function decodeJWT(accessToken: string) {
-    const decodedJWT = jwtDecode(accessToken)
-    console.log(decodedJWT)
-}
-
-export {oauthSignIn, getAccessToken}
+export { oauthSignIn }
