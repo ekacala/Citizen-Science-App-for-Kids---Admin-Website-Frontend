@@ -19,7 +19,7 @@ function oauthSignIn() {
                 'state': 'pass-through value'};
 
   // Add form parameters as hidden input values.
-  for (let p in params) {
+  for (const p in params) {
     const input = document.createElement('input');
     input.setAttribute('type', 'hidden');
     input.setAttribute('name', p);
