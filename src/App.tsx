@@ -1,84 +1,72 @@
 import './App.css' 
+import { getAccessToken, oauthSignIn } from './components/SignIn'
+import { addProject, exitAddProject, logoutAccount } from './components/navigation'
+import { dropdownMenu } from './components/menu'
+
+import menuButton from './assets/menu-icon.svg'
 
 function Login() {
   /* Returns the html for the login page */
   return (
     <>
-      <h1>Citizen Science App for Kids</h1>
       <div id='home-page'>
-        <div id='login-box'>
-          <form action='https://accounts.google.com/o/oauth2/v2/auth'>
-            <button type='submit' id='login-button'>Login with Google</button>
-          </form>
-          <p>------------------OR-------------------</p>
-          <form action='https://accounts.google.com/o/oauth2/v2/auth'>
-            <button type='submit' id='sign-up-button'>Create an Account</button>
-          </form>
-        </div>
-        <div id='welcome-box'>
-          <h2>Welcome!</h2>
-          <p>This is the administrative website for the app Citizen Science App for Kids, an app where students of all 
-            ages can record observations for citizen science projects. This website is where teachers can manage their 
-            student's projects and view their observations. Log in with Google or create an account to get started!
-          </p>
+        <h1 id='login-title'>Citizen Science App for Kids</h1>
+        <div id='login-section'>
+          <div id='login-box'>
+            <form action={oauthSignIn}>
+              <button type='submit' id='login-button'>Login with Google</button>
+            </form>
+            <p>------------------OR-------------------</p>
+            <form action={oauthSignIn}>
+              <button type='submit' id='sign-up-button'>Create an Account</button>
+            </form>
+          </div>
+          <div id='welcome-box'>
+            <h2>Welcome!</h2>
+            <p>This is the administrative website for the app Citizen Science App for Kids, an app where students of all 
+              ages can record observations for citizen science projects. This website is where teachers can manage their 
+              student's projects and view their observations. Log in with Google or create an account to get started!
+            </p>
+          </div>
         </div>
       </div>
     </>
   )
 }
 
-/*
- * Create form to request access token from Google's OAuth 2.0 server. - Plan to set this up next sprint
- 
-function oauthSignIn() {
-  // Google's OAuth 2.0 endpoint for requesting an access token
-  const oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
-
-  // Create <form> element to submit parameters to OAuth 2.0 endpoint.
-  const form = document.createElement('form');
-  form.setAttribute('method', 'GET'); // Send as a GET request.
-  form.setAttribute('action', oauth2Endpoint);
-
-  // Parameters to pass to OAuth 2.0 endpoint.
-  const params = {'client_id': 'YOUR_CLIENT_ID',
-                'redirect_uri': 'YOUR_REDIRECT_URI',
-                'response_type': 'token',
-                'scope': 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/calendar.readonly',
-                'include_granted_scopes': 'true',
-                'state': 'pass-through value'};
-
-  // Add form parameters as hidden input values.
-  for (let p in params) {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'hidden');
-    input.setAttribute('name', p);
-    input.setAttribute('value', p);
-    form.appendChild(input);
-  }
-
-  // Add form to page and submit it to open the OAuth 2.0 endpoint.
-  document.body.appendChild(form);
-  form.submit();
-}*/
-
 function ProjectList() {
-  /* Returns the html for the project list page. */
+  /* Returns the html for the project list page.*/
   return (
     <>
+    <div id='menu'>
+      <button onClick={dropdownMenu} id='menu-button'><img id='menu-button-img' src={ menuButton }></img></button>
+    </div>
+    <div id='dropdown-menu' className='hide'>
+      <a onClick={logoutAccount}><p>Logout</p></a>
+      <p>Delete Account</p>
+    </div>
     <h1>Projects</h1>
     <div id='project-list'>
       <table id='project-list-table'>
-        <tr>
-          <td>Title</td>
-          <td>Description</td>
-          <td>Code</td>
-        </tr>
-        <tr>
-          <td>Bee Observation</td>
-          <td>Record the number of bees spotted in the field next to the school for 1 week.</td>
-          <td>7ABD3</td>
-        </tr>
+        <thead>
+          <tr>
+            <td>Title</td>
+            <td>Description</td>
+            <td>Code</td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>Bee Observation</td>
+            <td>Record the number of bees spotted in the field next to the school for 1 week.</td>
+            <td>7ABD3</td>
+            <td><button id='edit-button'>Edit</button></td>
+          </tr>
+        </tbody>
       </table>
+      <button onClick={addProject} id='new-project-button'>Create New</button>
     </div>
     </>
   )
@@ -90,7 +78,7 @@ function NewProject() {
     <>
     <h1>Create a Project</h1>
     <div id='create-project'>
-      <button>X</button>
+      <button onClick={exitAddProject}>X</button>
       <form id='create-project-form'>
         <label form='title'>Title: </label>
         <input type='text' id='title' name='title'></input><br/>

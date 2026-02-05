@@ -15,8 +15,6 @@ a {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -42,7 +40,26 @@ button {
   transition: border-color 0.25s;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid black;
+}
+
+/*------ Login Page -----*/
+
 #home-page {
+  display: flex;
+  place-items: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+}
+
+#login-section {
   display: flex;
 }
 
@@ -60,10 +77,41 @@ button {
   margin-left: 25px;
 }
 
-table {
-  border-collapse: collapse;
+/*----- Project List Page -----*/
+
+#menu {
+  position: fixed;
+  right: 3vw;
 }
 
-th, td {
-  border: 1px solid black;
+#menu-button-img {
+  width: 40px;
+  height: 40px;
+}
+
+#dropdown-menu {
+  border: 1px solid #3AE070;
+  border-radius: 10px;
+  background-color: #3AE070;
+  width: 200px;
+  position: fixed;
+  right: 3vw;
+  top: 13vh;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+#new-project-button {
+  margin-top: 10px;
+}
+
+/*----- Create New Project -----*/
+#create-project-form {
+  border: solid 1px black;
 }
