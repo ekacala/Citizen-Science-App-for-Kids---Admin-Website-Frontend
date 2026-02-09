@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+
 import './App.css' 
 import { oauthSignIn } from './components/SignIn'
 import { addProject, exitAddProject, logoutAccount } from './components/navigation'
@@ -35,6 +37,38 @@ function Login() {
 }
 
 function ProjectList() {
+  interface project {
+    project_id: string;
+    project_title: string;
+    project_description: string;
+    project_code: string;
+  }
+  const [projects, setProjects] = useState<project[]>([]);
+  const [loaded, setLoaded] = useState(false)
+  const [emptyProjects, setEmptyProjects] = useState(true)
+
+  //Get list of projects for teacher
+  useEffect(() => {
+    //Need to enable login functionality in order to make teacher id in endpoint dynamic
+    fetch("https://csafk-277534145495.us-east4.run.app/api/users/1/projects")
+      .then((res) => res.json())
+      .then((json) => {
+        const projectArray = json.data
+        setProjects(projectArray);
+        if (projects.length > 0) {
+          setEmptyProjects(false)
+        }
+        setLoaded(true);
+      })
+  }, [loaded]);
+  if (!loaded) {
+    return (
+      <div>
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
+
   /* Returns the html for the project list page.*/
   return (
     <>
@@ -46,6 +80,9 @@ function ProjectList() {
       <p>Delete Account</p>
     </div>
     <h1>Projects</h1>
+    {emptyProjects ? (
+      <p>Welcome!</p>
+    ) : (
     <div id='project-list'>
       <table id='project-list-table'>
         <thead>
@@ -56,18 +93,21 @@ function ProjectList() {
             <td></td>
           </tr>
         </thead>
-        <tbody>
+        <tbody >
+          {projects.map((project) => (
+            <tr key={project.project_id}>
+              <td>{project.project_title}</td>
+              <td>{project.project_description}</td>
+              <td>{project.project_code}</td>
+              <td><button>Edit</button></td>
+            </tr>
+          ))}
           
-          <tr>
-            <td>Bee Observation</td>
-            <td>Record the number of bees spotted in the field next to the school for 1 week.</td>
-            <td>7ABD3</td>
-            <td><button id='edit-button'>Edit</button></td>
-          </tr>
         </tbody>
       </table>
       <button onClick={addProject} id='new-project-button'>Create New</button>
     </div>
+    )}
     </>
   )
 }
