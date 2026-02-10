@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-
+import type { FormEvent } from 'react'
 import './App.css' 
-import { oauthSignIn } from './components/SignIn'
-import { addProject, exitAddProject, logoutAccount } from './components/navigation'
+import { addProject, logoutAccount, projectPage } from './components/navigation'
 import { dropdownMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
@@ -15,12 +14,8 @@ function Login() {
         <h1 id='login-title'>Citizen Science App for Kids</h1>
         <div id='login-section'>
           <div id='login-box'>
-            <form action={oauthSignIn}>
-              <button type='submit' id='login-button'>Login with Google</button>
-            </form>
-            <p>------------------OR-------------------</p>
-            <form action={oauthSignIn}>
-              <button type='submit' id='sign-up-button'>Create an Account</button>
+            <form action='https://csafk-277534145495.us-east4.run.app/api/login'>
+              <button type='submit' id='login-button' >Login with Google</button>
             </form>
           </div>
           <div id='welcome-box'>
@@ -36,6 +31,32 @@ function Login() {
   )
 }
 
+function SuccessRedirect() {
+  //Get teacher info
+  const [teacher, setTeacher] = useState('');
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
+    //Need to enable login functionality in order to make teacher id in endpoint dynamic
+    fetch("https://csafk-277534145495.us-east4.run.app/api/me", {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const teacherArray = json.data
+        setTeacher(teacherArray.teacher_id);
+        setLoaded(true)
+      })
+  }, [loaded]);
+  console.log(teacher)
+  if(loaded) {
+    projectPage(teacher)
+  }
+  return ( 
+    <p>redirecting...</p>
+  )
+}
+
 function ProjectList() {
   interface project {
     project_id: string;
@@ -46,11 +67,15 @@ function ProjectList() {
   const [projects, setProjects] = useState<project[]>([]);
   const [loaded, setLoaded] = useState(false)
   const [emptyProjects, setEmptyProjects] = useState(true)
+  
+  const teacher_id = window.location.pathname.slice(-1)
 
   //Get list of projects for teacher
   useEffect(() => {
-    //Need to enable login functionality in order to make teacher id in endpoint dynamic
-    fetch("https://csafk-277534145495.us-east4.run.app/api/users/1/projects")
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/users/${teacher_id}/projects`, {
+      method: 'GET',
+      credentials: 'include'
+    })
       .then((res) => res.json())
       .then((json) => {
         const projectArray = json.data
@@ -81,7 +106,7 @@ function ProjectList() {
     </div>
     <h1>Projects</h1>
     {emptyProjects ? (
-      <p>Welcome!</p>
+      <p>Welcome! Please create a new project to get started.</p>
     ) : (
     <div id='project-list'>
       <table id='project-list-table'>
@@ -105,30 +130,66 @@ function ProjectList() {
           
         </tbody>
       </table>
-      <button onClick={addProject} id='new-project-button'>Create New</button>
     </div>
     )}
+    <button onClick={() => addProject(teacher_id)} id='new-project-button'>Create A New Project</button>
     </>
   )
 }
 
 function NewProject() {
+  const [teacherId, setTeacherId] = useState(window.location.pathname.slice(-1));
+  const [projectTitle, setProjectTitle] = useState('')
+  const [projectDescription, setProjectDescription] = useState('')
+  const [projectInstructions, setProjectInstructions] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+
+  // 3. Handle form submission
+  const createNewProject = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const data = {
+      teacher_id: teacherId,
+      project_title: projectTitle,
+      project_description: projectDescription,
+      project_instructions: projectInstructions
+    }
+    console.log(data)
+
+    try {
+      // 4. Send a POST request to your API endpoint
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      console.log('success')
+      setSubmitted(true)
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+    }
+    if (submitted) {
+      projectPage(teacherId)
+    }
+    
+  }
   /* Returns the html for the new project page. */
   return (
     <>
     <h1>Create a Project</h1>
     <div id='create-project'>
-      <button onClick={exitAddProject}>X</button>
-      <form id='create-project-form'>
-        <label form='title'>Title: </label>
-        <input type='text' id='title' name='title'></input><br/>
-        <label form='description'>Description: </label>
-        <input type='text' id='description' name='description'></input><br/>
-        <label form='instructions'>Instructions: </label>
-        <input type='text' id='instructions' name='instructions'></input><br/>
-        <label form='observations'>Observations: </label>
-        <input type='text' id='observations' name='observations'></input><br/>
-        <input type='button' value={'submit'} id='submit' name='submit'></input>
+      <button>X</button>
+      <form onSubmit={createNewProject} id='create-project-form'>
+        <label htmlFor='title'>Title: </label>
+        <input type='text' id='title' name='title' onChange={(event) => setProjectTitle(event.target.value)}></input><br/>
+        <label htmlFor='description'>Description: </label>
+        <textarea id='description' name='description' onChange={(event) => setProjectDescription(event.target.value)}></textarea><br/>
+        <label htmlFor='instructions'>Instructions: </label>
+        <textarea id='instructions' name='instructions' onChange={(event) => setProjectInstructions(event.target.value)}></textarea><br/>
+        <input type='submit' value={'submit'} id='submit' name='submit'></input>
       </form>
     </div>
     </>
@@ -176,4 +237,4 @@ function ProjectResults() {
   )
 }
 
-export {Login, ProjectList, NewProject, ProjectResults};
+export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults};

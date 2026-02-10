@@ -1,7 +1,7 @@
 const url = 'http://localhost:5173/'
 
-function addProject() {
-    window.location.href = url + 'new-project'
+function addProject(teacher_id: string) {
+    window.location.href = url + 'new-project/' + teacher_id
 }
 
 function exitAddProject() {
@@ -12,4 +12,8 @@ function logoutAccount() {
     window.location.replace(url)
 }
 
-export {addProject, exitAddProject, logoutAccount}
+function projectPage(teacher_id: string) {
+    window.location.href = url + 'projects/' + teacher_id
+}
+
+export {addProject, projectPage, logoutAccount}

@@ -107,6 +107,10 @@ th, td {
   display: block;
 }
 
+#project-list-table {
+  width: 100%;
+}
+
 #new-project-button {
   margin-top: 10px;
 }
@@ -114,4 +118,17 @@ th, td {
 /*----- Create New Project -----*/
 #create-project-form {
   border: solid 1px black;
+  max-width: 500px;
+  height: 500px;
+  margin: 0 auto;
+}
+
+input {
+  margin: 10px 0px;
+
+}
+
+#description {
+  height: 150px;
+  max-width: 500px;
 }
