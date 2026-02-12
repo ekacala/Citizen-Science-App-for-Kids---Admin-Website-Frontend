@@ -9,7 +9,16 @@ function exitAddProject() {
 }
 
 function logoutAccount() {
-    window.location.replace(url)
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json)
+        window.location.replace(url)
+      })
+    
 }
 
 function projectPage(teacher_id: string) {

@@ -94,6 +94,29 @@ function ProjectList() {
     );
   }
 
+  const deleteProject = (event: FormEvent<HTMLFormElement>, project_id: string) => {
+    event.preventDefault()
+    console.log('click')
+
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${project_id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    .then((res) => res.json())
+      .then((json) => {
+        console.log(json)
+        const updatedProjects = projects.filter(project => project.project_id !== project_id)
+        setProjects(updatedProjects)
+        })  
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
+  }
+
   /* Returns the html for the project list page.*/
   return (
     <>
@@ -115,8 +138,7 @@ function ProjectList() {
             <td>Title</td>
             <td>Description</td>
             <td>Code</td>
-            <td></td>
-            <td></td>
+            <td>Delete a Project</td>
           </tr>
         </thead>
         <tbody >
@@ -125,8 +147,11 @@ function ProjectList() {
               <td>{project.project_title}</td>
               <td>{project.project_description}</td>
               <td>{project.project_code}</td>
-              <td><button>Edit</button></td> {/*Does nothing*/}
-              <td><button>Delete</button></td> {/*Does nothing*/}
+              <td>
+                <form onSubmit={(event) => deleteProject(event, project.project_id)}>
+                  <button type='submit'>Delete</button>
+                </form>
+              </td>
             </tr>
           ))}
           
@@ -260,7 +285,6 @@ function NewProject() {
           // Return to project page if new project was created
           if (projectCreated) {
             console.log(projectId)
-            //projectPage(teacherId)
           }
         })  
     } catch (error) {
