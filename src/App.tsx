@@ -116,6 +116,7 @@ function ProjectList() {
             <td>Description</td>
             <td>Code</td>
             <td></td>
+            <td></td>
           </tr>
         </thead>
         <tbody >
@@ -124,7 +125,8 @@ function ProjectList() {
               <td>{project.project_title}</td>
               <td>{project.project_description}</td>
               <td>{project.project_code}</td>
-              <td><button>Edit</button></td>
+              <td><button>Edit</button></td> {/*Does nothing*/}
+              <td><button>Delete</button></td> {/*Does nothing*/}
             </tr>
           ))}
           
@@ -138,15 +140,97 @@ function ProjectList() {
 }
 
 function NewProject() {
-  const [teacherId, setTeacherId] = useState(window.location.pathname.slice(-1));
+  const teacherId = window.location.pathname.slice(-1)
+  // Info collected to create new project
   const [projectTitle, setProjectTitle] = useState('')
   const [projectDescription, setProjectDescription] = useState('')
   const [projectInstructions, setProjectInstructions] = useState('')
-  const [submitted, setSubmitted] = useState(false)
 
-  // 3. Handle form submission
+  // Info collected to add data fields to a project
+  const [projectId, setProjectId] = useState('-1')
+  const [projectFieldName, setProjectFieldName] = useState('')
+  const [projectFieldType, setProjectFieldType] = useState('')
+  const [projectFieldLabel, setProjectFieldLabel] = useState('')
+  //const [projectFieldOptions, setProjectFieldOptions] = useState('')
+  const [projectIsRequired, setProjectIsRequired] = useState('false')
+  let boolProjectIsRequired = false
+
+  // Track progress through form
+  const [projectCreated, setProjectCreated] = useState(false)
+  const [dataAdded, setDataAdded] = useState(false)
+
+  // Submit form to create data points for the newly created project
+  const addData = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    console.log('add data')
+
+    // Convert projectIsRequired to boolean
+    if (projectIsRequired == 'false') {
+      boolProjectIsRequired = false
+    } else {
+      boolProjectIsRequired = true
+    }
+
+    // Check if form input is empty
+    if (projectFieldName == '' || projectFieldType == '' || projectFieldLabel == '') {
+      alert('Please fill out all fields to create a project.')
+      return
+    }
+
+    // Put data in JSON format
+    const data = {
+      field_name: projectFieldName,
+      field_label: projectFieldLabel,
+      field_type: projectFieldType,
+      is_required: boolProjectIsRequired
+    }
+    console.log(data)
+
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then((res) => res.json())
+      .then((json) => {
+        console.log(json)
+        setDataAdded(true)
+        })
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
+  }
+
+  useEffect(() => {
+    if(dataAdded) {
+      setProjectFieldName('')
+      setProjectFieldType('')
+      setProjectFieldLabel('')
+      setProjectIsRequired('false')
+      console.log(projectFieldName)
+      setDataAdded(false)
+    }
+  }, [addData])
+
+  // Submit form to create new project
   const createNewProject = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    // Check if form input is empty
+    // Will likely need to expand this to check for more incorrect submissions
+    if (projectTitle == '' || projectDescription == '' || projectInstructions == '') {
+      alert('Please fill out all fields to create a project.')
+      return
+    }
+
+    // Put data in JSON format
     const data = {
       teacher_id: teacherId,
       project_title: projectTitle,
@@ -156,7 +240,7 @@ function NewProject() {
     console.log(data)
 
     try {
-      // 4. Send a POST request to your API endpoint
+      // Send POST request
       fetch(`https://csafk-277534145495.us-east4.run.app/api/projects`, {
       method: 'POST',
       credentials: 'include',
@@ -165,23 +249,35 @@ function NewProject() {
       },
       body: JSON.stringify(data)
     })
-      console.log('success')
-      setSubmitted(true)
+    .then((res) => res.json())
+      .then((json) => {
+        const fieldArray = json.data
+        setProjectId(fieldArray.project_id)
+        console.log(projectId)
+        setProjectCreated(true)
+        })
+        .then(() => {
+          // Return to project page if new project was created
+          if (projectCreated) {
+            console.log(projectId)
+            //projectPage(teacherId)
+          }
+        })  
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('Failed to submit form.');
-    }
-    if (submitted) {
-      projectPage(teacherId)
+      console.log('error block')
     }
     
   }
+
   /* Returns the html for the new project page. */
   return (
     <>
     <h1>Create a Project</h1>
+    {!projectCreated ? (
     <div id='create-project'>
-      <button>X</button>
+      <button onClick={(event) => projectPage(teacherId)}>Take Me Back</button>
       <form onSubmit={createNewProject} id='create-project-form'>
         <label htmlFor='title'>Title: </label>
         <input type='text' id='title' name='title' onChange={(event) => setProjectTitle(event.target.value)}></input><br/>
@@ -189,9 +285,43 @@ function NewProject() {
         <textarea id='description' name='description' onChange={(event) => setProjectDescription(event.target.value)}></textarea><br/>
         <label htmlFor='instructions'>Instructions: </label>
         <textarea id='instructions' name='instructions' onChange={(event) => setProjectInstructions(event.target.value)}></textarea><br/>
-        <input type='submit' value={'submit'} id='submit' name='submit'></input>
+        <input type='submit' value={'Create Project'} id='submit' name='submit'></input>
       </form>
     </div>
+    ) : (
+    <div id='add-data'>
+      <form onSubmit={addData} id='add-data-form'>
+        <label htmlFor='name'>Name: </label>
+        <input type='text' id='name' name='name' value={projectFieldName} onChange={(event) => setProjectFieldName(event.target.value)}></input><br/>
+
+        <label htmlFor='type'>Type: </label>
+        <select name='type' id='type' value={projectFieldType} onChange={(event) => setProjectFieldType(event.target.value)}>
+          <option value={'text'}>Single Line Text</option>
+          <option value={'textarea'}>Multi Line Paragraph</option>
+          <option value={'number'}>Number</option>
+          <option value={'date'}>Date</option>
+          <option value={'time'}>Time</option>
+          {/*<option value={'checkbox'}>checkbox</option>
+          <option value={'radio'}>radio</option>*/}
+        </select><br/>
+
+        <label htmlFor='label'>Label: </label>
+        <input type='text' id='label' name='name' value={projectFieldLabel} onChange={(event) => setProjectFieldLabel(event.target.value)}></input><br/>
+
+       {/*} <label htmlFor='options'>Options: </label>
+        <input type='textarea' id='textarea' name='textarea'></input><br/>*/}
+
+        <label htmlFor='required'>Is this data point required? </label>
+        <select name='required' id='required' value={projectIsRequired} onChange={(event) => setProjectIsRequired(event.target.value)}>
+          <option value={'false'}>No</option>
+          <option value={'true'}>Yes</option>
+        </select><br/>
+
+        <input type='submit' value={'Add Data Point'} id='submit' name='submit'></input>
+      </form>
+      <button onClick={(event) => projectPage(teacherId)}>I'm Done Adding Data Points</button>
+    </div>
+    )}
     </>
   )
 }
