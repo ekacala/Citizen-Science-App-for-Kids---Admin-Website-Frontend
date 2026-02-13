@@ -301,7 +301,7 @@ function NewProject() {
     <h1>Create a Project</h1>
     {!projectCreated ? (
     <div id='create-project'>
-      <button onClick={(event) => projectPage(teacherId)}>Take Me Back</button>
+      <button id='exit-create-project-button' onClick={(event) => projectPage(teacherId)}>X</button>
       <form onSubmit={createNewProject} id='create-project-form'>
         <label htmlFor='title'>Title: </label>
         <input type='text' id='title' name='title' onChange={(event) => setProjectTitle(event.target.value)}></input><br/>
@@ -343,7 +343,7 @@ function NewProject() {
 
         <input type='submit' value={'Add Data Point'} id='submit' name='submit'></input>
       </form>
-      <button onClick={(event) => projectPage(teacherId)}>I'm Done Adding Data Points</button>
+      <button id='exit-create-data-button' onClick={(event) => projectPage(teacherId)}>I'm Done Adding Data Points</button>
     </div>
     )}
     </>

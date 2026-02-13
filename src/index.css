@@ -29,17 +29,6 @@ h2 {
   margin-top: 0px;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
 table {
   border-collapse: collapse;
 }
@@ -75,6 +64,17 @@ th, td {
 #welcome-box {
   max-width: 600px;
   margin-left: 25px;
+}
+
+#login-button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
 }
 
 /*----- Project List Page -----*/
@@ -121,6 +121,16 @@ th, td {
   max-width: 500px;
   height: 500px;
   margin: 0 auto;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+#exit-create-project-button {
+  background-color: transparent;
+  position: relative;
+  left: 230px;
+  top: 40px;
 }
 
 input {
@@ -128,7 +138,45 @@ input {
 
 }
 
-#description {
+#title {
+  width: 400px;
+  margin: 0 auto;
+}
+
+#description,
+#instructions {
   height: 150px;
+  width: 400px;
   max-width: 500px;
+  margin: 0 auto;
+}
+
+#submit {
+  width: 100px;
+  margin: 0 auto 20px auto;
+}
+
+#add-data-form {
+  border: solid 1px black;
+  max-width: 500px;
+  height: 350px;
+  margin: 0 auto;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+#add-data-form input,
+#add-data-form select {
+  width: 250px;
+  margin: 0 auto;
+}
+
+#add-data-form #submit {
+  width: 110px;
+}
+
+#exit-create-data-button {
+  position: relative;
+  bottom: 50px;
 }
