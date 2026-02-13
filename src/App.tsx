@@ -149,7 +149,7 @@ function ProjectList() {
               <td>{project.project_code}</td>
               <td>
                 <form onSubmit={(event) => deleteProject(event, project.project_id)}>
-                  <button type='submit'>Delete</button>
+                  <button type='submit' id='delete-project-button'>Delete</button>
                 </form>
               </td>
             </tr>

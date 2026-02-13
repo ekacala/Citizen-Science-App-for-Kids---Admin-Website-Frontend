@@ -89,6 +89,14 @@ th, td {
   height: 40px;
 }
 
+#menu-button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background-color: transparent;
+  padding: 0.6em 1.2em;
+  cursor: pointer;
+}
+
 #dropdown-menu {
   border: 1px solid #3AE070;
   border-radius: 10px;
@@ -113,6 +121,25 @@ th, td {
 
 #new-project-button {
   margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+#delete-project-button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.4em 1em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
 }
 
 /*----- Create New Project -----*/
@@ -131,6 +158,10 @@ th, td {
   position: relative;
   left: 230px;
   top: 40px;
+  border: none;
+  padding: 0.4em 1em;
+  font-size: 1em;
+  font-weight: 500;
 }
 
 input {
