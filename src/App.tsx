@@ -174,7 +174,7 @@ function NewProject() {
   // Info collected to add data fields to a project
   const [projectId, setProjectId] = useState('-1')
   const [projectFieldName, setProjectFieldName] = useState('')
-  const [projectFieldType, setProjectFieldType] = useState('')
+  const [projectFieldType, setProjectFieldType] = useState('text')
   const [projectFieldLabel, setProjectFieldLabel] = useState('')
   //const [projectFieldOptions, setProjectFieldOptions] = useState('')
   const [projectIsRequired, setProjectIsRequired] = useState('false')
@@ -187,7 +187,6 @@ function NewProject() {
   // Submit form to create data points for the newly created project
   const addData = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log('add data')
 
     // Convert projectIsRequired to boolean
     if (projectIsRequired == 'false') {
@@ -239,7 +238,6 @@ function NewProject() {
       setProjectFieldType('')
       setProjectFieldLabel('')
       setProjectIsRequired('false')
-      console.log(projectFieldName)
       setDataAdded(false)
     }
   }, [addData])
@@ -278,14 +276,7 @@ function NewProject() {
       .then((json) => {
         const fieldArray = json.data
         setProjectId(fieldArray.project_id)
-        console.log(projectId)
         setProjectCreated(true)
-        })
-        .then(() => {
-          // Return to project page if new project was created
-          if (projectCreated) {
-            console.log(projectId)
-          }
         })  
     } catch (error) {
       console.error('Error submitting form:', error);
