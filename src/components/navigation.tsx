@@ -4,10 +4,6 @@ function addProject(teacher_id: string) {
     window.location.href = url + 'new-project/' + teacher_id
 }
 
-function exitAddProject() {
-    window.location.href = url + 'projects'
-}
-
 function logoutAccount() {
     fetch(`https://csafk-277534145495.us-east4.run.app/api/logout`, {
       method: 'POST',
