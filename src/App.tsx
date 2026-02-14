@@ -178,7 +178,7 @@ function NewProject() {
   const [projectFieldLabel, setProjectFieldLabel] = useState('')
   //const [projectFieldOptions, setProjectFieldOptions] = useState('')
   const [projectIsRequired, setProjectIsRequired] = useState('false')
-  let boolProjectIsRequired = false
+  const [boolProjectIsRequired, setBoolProjectIsRequired] = useState(false)
 
   // Track progress through form
   const [projectCreated, setProjectCreated] = useState(false)
@@ -190,7 +190,7 @@ function NewProject() {
 
     // Convert projectIsRequired to boolean
     if (projectIsRequired == 'true') {
-      boolProjectIsRequired = true
+      setBoolProjectIsRequired(true)
     }
 
     // Check if form input is empty
@@ -233,9 +233,10 @@ function NewProject() {
   useEffect(() => {
     if(dataAdded) {
       setProjectFieldName('')
-      setProjectFieldType('')
+      setProjectFieldType('text')
       setProjectFieldLabel('')
       setProjectIsRequired('false')
+      setBoolProjectIsRequired(false)
       setDataAdded(false)
     }
   }, [addData])
