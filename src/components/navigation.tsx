@@ -1,3 +1,4 @@
+//const url = 'https://citizen-science-app-for-kids-admin.vercel.app/'
 const url = 'http://localhost:5173/'
 
 function addProject(teacher_id: string) {
@@ -21,4 +22,8 @@ function projectPage(teacher_id: string) {
     window.location.href = url + 'projects/' + teacher_id
 }
 
-export {addProject, projectPage, logoutAccount}
+function projectDetailsPage(teacher_id: string, project_id: string) {
+  window.location.href = url + 'project-results/' + teacher_id + '/' + project_id
+}
+
+export {addProject, projectPage, logoutAccount, projectDetailsPage}

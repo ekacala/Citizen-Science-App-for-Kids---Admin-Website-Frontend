@@ -117,6 +117,23 @@ th, td {
 
 #project-list-table {
   width: 100%;
+  
+}
+
+#project-title-table-data {
+  min-width: 140px;
+}
+
+#project-description-table-data {
+  min-width: 300px;
+}
+
+#project-id-table-data {
+  width: 140px;
+}
+
+#project-delete-table-data {
+  width: 140px;
 }
 
 #new-project-button {

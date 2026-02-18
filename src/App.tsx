@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
 import './App.css' 
-import { addProject, logoutAccount, projectPage } from './components/navigation'
+import { addProject, logoutAccount, projectDetailsPage, projectPage } from './components/navigation'
 import { dropdownMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
@@ -135,16 +135,16 @@ function ProjectList() {
       <table id='project-list-table'>
         <thead>
           <tr>
-            <td>Title</td>
-            <td>Description</td>
-            <td>Code</td>
-            <td>Delete a Project</td>
+            <td id='project-title-table-data'>Title</td>
+            <td id='project-description-table-data'>Description</td>
+            <td id='project-id-table-data'>Code</td>
+            <td id='project-delete-table-data'>Delete a Project</td>
           </tr>
         </thead>
         <tbody >
           {projects.map((project) => (
             <tr key={project.project_id}>
-              <td>{project.project_title}</td>
+              <td><a onClick={() => projectDetailsPage(teacher_id, project.project_id)}>{project.project_title}</a></td>
               <td>{project.project_description}</td>
               <td>{project.project_code}</td>
               <td>
@@ -176,7 +176,7 @@ function NewProject() {
   const [projectFieldName, setProjectFieldName] = useState('')
   const [projectFieldType, setProjectFieldType] = useState('text')
   const [projectFieldLabel, setProjectFieldLabel] = useState('')
-  //const [projectFieldOptions, setProjectFieldOptions] = useState('')
+  const [projectFieldOptions, setProjectFieldOptions] = useState('')
   const [projectIsRequired, setProjectIsRequired] = useState('false')
   let boolProjectIsRequired = false
 
@@ -202,7 +202,7 @@ function NewProject() {
     // Put data in JSON format
     const data = {
       field_name: projectFieldName,
-      field_label: projectFieldLabel,
+      field_label: projectFieldName,
       field_type: projectFieldType,
       is_required: boolProjectIsRequired
     }
@@ -228,6 +228,10 @@ function NewProject() {
       alert('Failed to submit form.');
       console.log('error block')
     }
+  }
+
+  if (projectFieldType == 'checkbox' || projectFieldType == 'radio') {
+    console.log('multi-option')
   }
 
   useEffect(() => {
@@ -314,15 +318,15 @@ function NewProject() {
           <option value={'number'}>Number</option>
           <option value={'date'}>Date</option>
           <option value={'time'}>Time</option>
-          {/*<option value={'checkbox'}>checkbox</option>
-          <option value={'radio'}>radio</option>*/}
+          <option value={'checkbox'}>checkbox</option>
+          <option value={'radio'}>radio</option>
         </select><br/>
 
-        <label htmlFor='label'>Label: </label>
-        <input type='text' id='label' name='name' value={projectFieldLabel} onChange={(event) => setProjectFieldLabel(event.target.value)}></input><br/>
+        {/*<label htmlFor='label'>Label: </label>
+        <input type='text' id='label' name='name' value={projectFieldLabel} onChange={(event) => setProjectFieldLabel(event.target.value)}></input><br/>*/}
 
-       {/*} <label htmlFor='options'>Options: </label>
-        <input type='textarea' id='textarea' name='textarea'></input><br/>*/}
+        <label htmlFor='options'>Options: </label>
+        <input type='textarea' id='textarea' name='textarea'></input><br/>
 
         <label htmlFor='required'>Is this data point required? </label>
         <select name='required' id='required' value={projectIsRequired} onChange={(event) => setProjectIsRequired(event.target.value)}>
@@ -340,38 +344,97 @@ function NewProject() {
 }
 
 function ProjectResults() {
+  // Get teacherId and projectId
+  const idNums = window.location.pathname.slice(17)
+  const idList = idNums.split('/')
+  const teacherId = idList[0]
+  const projectId = idList[1]
+
+  const [loaded, setLoaded] = useState(false)
+
+  const [projectTitle, setProjectTitle] = useState('')
+  const [projectCode, setProjectCode] = useState('')
+  const [projectDescription, setProjectDescription] = useState('')
+  const [projectInstructions, setProjectInstructions] =useState('')
+
+  // Get details of project
+  useEffect(() => {
+    // Get project
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const projectArray = json.data
+        setProjectTitle(projectArray.project_title)
+        setProjectCode(projectArray.project_code)
+        setProjectDescription(projectArray.project_description)
+        setProjectInstructions(projectArray.project_instructions)
+        setLoaded(true)
+        //console.log(projectArray)
+      })
+    // Get fields
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const fieldsArray = json.data 
+        console.log(fieldsArray)
+      })
+  }, [loaded]);
+  if (!loaded) {
+    return (
+      <div>
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
+
   /* Returns the html for the project results page. */
   return (
     <>
     <h1>Project Results</h1>
-    <button>Back</button>
+    <button onClick={() => projectPage(teacherId)}>Back</button>
+    <div id='project-details'>
+      <p>Title: {projectTitle}</p>
+      <p>Code: {projectCode}</p>
+      <p>Description: {projectDescription}</p>
+      <p>Instructions: {projectInstructions}</p>
+    </div>
     <div id='project-results'>
       <table id='project-results-table'>
-        <tr>
-          <td>Student</td>
-          <td>Day of the Week</td>
-          <td>Number of Bees</td>
-        </tr>
-        <tr>
-          <td>Jimmy</td>
-          <td>Monday</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <td>Kim</td>
-          <td>Monday</td>
-          <td>2</td>
-        </tr>
-        <tr>
-          <td>Jimmy</td>
-          <td>Tuesday</td>
-          <td>4</td>
-        </tr>
-        <tr>
-          <td>Kim</td>
-          <td>Tuesday</td>
-          <td>5</td>
-        </tr>
+        <thead>
+          <tr>
+            <td>Student</td>
+            <td>Day of the Week</td>
+            <td>Number of Bees</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jimmy</td>
+            <td>Monday</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>Kim</td>
+            <td>Monday</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td>Jimmy</td>
+            <td>Tuesday</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>Kim</td>
+            <td>Tuesday</td>
+            <td>5</td>
+          </tr>
+        </tbody>
       </table>
       <button>Create Me a Graph</button>
       <button>Download SVG</button>
