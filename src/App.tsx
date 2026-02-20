@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
-import type { FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
+import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import './App.css' 
 import { addProject, logoutAccount, projectDetailsPage, projectPage } from './components/navigation'
 import { dropdownMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
+//import { stringify } from 'querystring'
 
 function Login() {
   /* Returns the html for the login page */
@@ -173,41 +174,53 @@ function NewProject() {
 
   // Info collected to add data fields to a project
   const [projectId, setProjectId] = useState('-1')
-  const [projectFieldName, setProjectFieldName] = useState('')
-  const [projectFieldType, setProjectFieldType] = useState('text')
-  const [projectFieldLabel, setProjectFieldLabel] = useState('')
-  const [projectFieldOptions, setProjectFieldOptions] = useState('')
-  const [projectIsRequired, setProjectIsRequired] = useState('false')
-  let boolProjectIsRequired = false
 
   // Track progress through form
   const [projectCreated, setProjectCreated] = useState(false)
-  const [dataAdded, setDataAdded] = useState(false)
 
-  // Submit form to create data points for the newly created project
-  const addData = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  // Define FormData types for fields form
+  type FormData = {
+    field_name: string
+    field_type: string
+    field_label: string
+    field_options: string
+    field_required: null
+  }
 
-    // Convert projectIsRequired to boolean
-    if (projectIsRequired == 'true') {
-      boolProjectIsRequired = true
-    }
+  // Remove any blank values
+  const cleanData = (data: any) => {
+    return Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== '')
+    )
+  }
 
-    // Check if form input is empty
-    if (projectFieldName == '' || projectFieldType == '' || projectFieldLabel == '') {
-      alert('Please fill out all fields to create a project.')
-      return
-    }
+  // Convert is_required to boolean
+  const parseBoolean = (value: string) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+  }
 
-    // Put data in JSON format
-    const data = {
-      field_name: projectFieldName,
-      field_label: projectFieldName,
-      field_type: projectFieldType,
-      is_required: boolProjectIsRequired
-    }
-    console.log(data)
+  const {
+    register,
+    reset,
+    setValue,
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful },
+  } = useForm<FormData>()
 
+  // Disable field_options input if field_type is radio or checkbox
+  const watchFieldType = useWatch({control, name: 'field_type',})
+  const isOptionsDisabled = watchFieldType?.includes('text') || 
+    watchFieldType?.includes('textarea') ||
+    watchFieldType?.includes('number') ||
+    watchFieldType?.includes('date') ||
+    watchFieldType?.includes('time')
+
+
+  const onSubmit = async (data: any) => {
+    const cleanedData = cleanData(data)
+    console.log(cleanedData)
     try {
       // Send POST request
       fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
@@ -216,12 +229,11 @@ function NewProject() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(cleanedData)
     })
     .then((res) => res.json())
       .then((json) => {
         console.log(json)
-        setDataAdded(true)
         })
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -230,19 +242,11 @@ function NewProject() {
     }
   }
 
-  if (projectFieldType == 'checkbox' || projectFieldType == 'radio') {
-    console.log('multi-option')
-  }
-
   useEffect(() => {
-    if(dataAdded) {
-      setProjectFieldName('')
-      setProjectFieldType('text')
-      setProjectFieldLabel('')
-      setProjectIsRequired('false')
-      setDataAdded(false)
+    if (isSubmitSuccessful) {
+      reset()
     }
-  }, [addData])
+  })
 
   // Submit form to create new project
   const createNewProject = (event: FormEvent<HTMLFormElement>) => {
@@ -307,12 +311,16 @@ function NewProject() {
     </div>
     ) : (
     <div id='add-data'>
-      <form onSubmit={addData} id='add-data-form'>
-        <label htmlFor='name'>Name: </label>
-        <input type='text' id='name' name='name' value={projectFieldName} onChange={(event) => setProjectFieldName(event.target.value)}></input><br/>
+      <form onSubmit={handleSubmit(onSubmit)} id='add-data-form'>
+        <label htmlFor='field_name'>Name: </label>
+        {/*<input type='text' id='field_name' name='field_name' value={projectFieldName} onChange={(event) => setProjectFieldName(event.target.value)}></input><br/>*/}
+        <input type='text' id='field_name' defaultValue={''} {...register('field_name')} ></input><br/>
 
-        <label htmlFor='type'>Type: </label>
-        <select name='type' id='type' value={projectFieldType} onChange={(event) => setProjectFieldType(event.target.value)}>
+        <label htmlFor='field_label'>Label: </label>
+        <input type='text' id='field_label' defaultValue={''} {...register('field_label')}></input><br/>
+
+        <label htmlFor='field_type'>Type: </label>
+        <select id='field_type' defaultValue={'text'} {...register('field_type')}>
           <option value={'text'}>Single Line Text</option>
           <option value={'textarea'}>Multi Line Paragraph</option>
           <option value={'number'}>Number</option>
@@ -325,16 +333,17 @@ function NewProject() {
         {/*<label htmlFor='label'>Label: </label>
         <input type='text' id='label' name='name' value={projectFieldLabel} onChange={(event) => setProjectFieldLabel(event.target.value)}></input><br/>*/}
 
-        <label htmlFor='options'>Options: </label>
-        <input type='textarea' id='textarea' name='textarea'></input><br/>
+        <label htmlFor='field_options'>Options: </label>
+        <input type='textarea' id='field_options' defaultValue={''} {...register('field_options')} disabled = {isOptionsDisabled}></input><br/>
 
-        <label htmlFor='required'>Is this data point required? </label>
-        <select name='required' id='required' value={projectIsRequired} onChange={(event) => setProjectIsRequired(event.target.value)}>
+        <label htmlFor='field_required'>Is this data point required? </label>
+        <select id='field_required' defaultValue={''} {...register('field_required', { setValueAs: parseBoolean })}>
           <option value={'false'}>No</option>
           <option value={'true'}>Yes</option>
+          
         </select><br/>
 
-        <input type='submit' value={'Add Data Point'} id='submit' name='submit'></input>
+        <input type='submit' value={'Add Data Point'} id='field_submit' name='field_submit'></input>
       </form>
       <button id='exit-create-data-button' onClick={() => projectPage(teacherId)}>I'm Done Adding Data Points</button>
     </div>
@@ -342,6 +351,7 @@ function NewProject() {
     </>
   )
 }
+
 
 function ProjectResults() {
   // Get teacherId and projectId
