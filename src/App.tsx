@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form'
+import { Controller, useForm, useWatch, useFieldArray, type SubmitHandler } from 'react-hook-form'
 import './App.css' 
 import { addProject, logoutAccount, projectDetailsPage, projectPage } from './components/navigation'
 import { dropdownMenu } from './components/menu'
@@ -183,7 +183,7 @@ function NewProject() {
     field_name: string
     field_type: string
     field_label: string
-    field_options: string
+    field_options: {option: string}[]
     field_required: null
   }
 
@@ -203,24 +203,52 @@ function NewProject() {
   const {
     register,
     reset,
-    setValue,
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitSuccessful },
-  } = useForm<FormData>()
+  } = useForm<FormData>({
+    defaultValues: {
+      field_options: [{option: ''}]
+    }
+  })
+
+  // Convert field_options from json to plain array
+  const convertJson = (data: any) => {
+    let fieldOptionsArray = []
+    if (data.field_options[0]['option'] == '') {
+      delete data['field_options']
+      return data
+    } else {
+    for (let d in data.field_options) {
+     fieldOptionsArray.push(data.field_options[d]['option'])
+     //console.log(data.field_options[d]['option'])
+    }
+    data.field_options = fieldOptionsArray
+    //data.field_options = ['1']
+   // console.log(fieldOptionsArray)
+    return data
+    }
+  }
 
   // Disable field_options input if field_type is radio or checkbox
-  const watchFieldType = useWatch({control, name: 'field_type',})
-  const isOptionsDisabled = watchFieldType?.includes('text') || 
+  const watchFieldType = useWatch({control, name: 'field_type', defaultValue: 'text'})
+  const isOptionsDisabled = watchFieldType?.includes('text') ||
     watchFieldType?.includes('textarea') ||
     watchFieldType?.includes('number') ||
     watchFieldType?.includes('date') ||
     watchFieldType?.includes('time')
 
+  const {fields, append, remove} = useFieldArray({
+    control,
+    name: 'field_options'
+  })
 
+  // Submit form to create new fields for a project
   const onSubmit = async (data: any) => {
     const cleanedData = cleanData(data)
-    console.log(cleanedData)
+    const convertedData = convertJson(cleanedData)
+    console.log(convertedData)
     try {
       // Send POST request
       fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
@@ -229,7 +257,7 @@ function NewProject() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(cleanedData)
+      body: JSON.stringify(convertedData)
     })
     .then((res) => res.json())
       .then((json) => {
@@ -326,15 +354,22 @@ function NewProject() {
           <option value={'number'}>Number</option>
           <option value={'date'}>Date</option>
           <option value={'time'}>Time</option>
-          <option value={'checkbox'}>checkbox</option>
-          <option value={'radio'}>radio</option>
+          <option value={'checkbox'}>Checkbox</option>
+          <option value={'radio'}>Multiple Choice</option>
         </select><br/>
 
-        {/*<label htmlFor='label'>Label: </label>
-        <input type='text' id='label' name='name' value={projectFieldLabel} onChange={(event) => setProjectFieldLabel(event.target.value)}></input><br/>*/}
-
         <label htmlFor='field_options'>Options: </label>
-        <input type='textarea' id='field_options' defaultValue={''} {...register('field_options')} disabled = {isOptionsDisabled}></input><br/>
+        <ul id='field-options-list'>
+          {fields.map((field, index) => (
+            <li key={field.id}>
+              <input type='text' id='field_options' defaultValue={''} {...register(`field_options.${index}.option`)} disabled = {isOptionsDisabled}></input>
+              <button type='button' className='delete-field-option-button' onClick={() => remove(index)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+          {/*<input type='text' id='field_options' defaultValue={''} {...register('field_options')} disabled = {isOptionsDisabled}></input><br/>*/}
+
+        <button id='add-field-option-button' type='button' onClick={() => append({option: ''})}>Add Option</button>
 
         <label htmlFor='field_required'>Is this data point required? </label>
         <select id='field_required' defaultValue={''} {...register('field_required', { setValueAs: parseBoolean })}>
@@ -343,9 +378,11 @@ function NewProject() {
           
         </select><br/>
 
-        <input type='submit' value={'Add Data Point'} id='field_submit' name='field_submit'></input>
+        <input type='submit' value={'Add Data Point'} id='field-submit' name='field_submit'></input>
+
+        <button id='exit-create-data-button' onClick={() => projectPage(teacherId)}>I'm Done Adding Data Points</button>
       </form>
-      <button id='exit-create-data-button' onClick={() => projectPage(teacherId)}>I'm Done Adding Data Points</button>
+      
     </div>
     )}
     </>
