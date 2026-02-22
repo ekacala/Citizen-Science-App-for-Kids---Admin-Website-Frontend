@@ -127,7 +127,7 @@ function ProjectList() {
       <button onClick={dropdownMenu} id='menu-button'><img id='menu-button-img' src={ menuButton }></img></button>
     </div>
     <div id='dropdown-menu' className='hide'>
-      <a onClick={logoutAccount}><p>Logout</p></a>
+      <a className='dropdown-button' onClick={logoutAccount}><p>Logout</p></a>
       <p>Delete Account</p>
     </div>
     <h1>Projects</h1>
@@ -147,7 +147,7 @@ function ProjectList() {
         <tbody >
           {projects.map((project) => (
             <tr key={project.project_id}>
-              <td><a onClick={() => projectDetailsPage(teacher_id, project.project_id)}>{project.project_title}</a></td>
+              <td><a onClick={() => projectDetailsPage(teacher_id, project.project_id)} id='project-title-link'>{project.project_title}</a></td>
               <td>{project.project_description}</td>
               <td>{project.project_code}</td>
               <td>
