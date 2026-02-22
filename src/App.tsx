@@ -5,6 +5,7 @@ import { addProject, logoutAccount, projectDetailsPage, projectPage } from './co
 import { dropdownMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
+import googleIcon from './assets/google-logo.svg'
 //import { stringify } from 'querystring'
 
 function Login() {
@@ -18,6 +19,7 @@ function Login() {
             <form action='https://csafk-277534145495.us-east4.run.app/api/login'>
               <button type='submit' id='login-button' >Login with Google</button>
             </form>
+            <img id='google-login-image' src={googleIcon}></img>
           </div>
           <div id='welcome-box'>
             <h2>Welcome!</h2>
