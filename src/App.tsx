@@ -72,7 +72,8 @@ function ProjectList() {
   const [emptyProjects, setEmptyProjects] = useState(true)
   const [projectId, setProjectId] = useState('')
   
-  const teacher_id = window.location.pathname.slice(-1)
+  // Get teacher id from url
+  const teacher_id = window.location.pathname.slice(10)
 
   //Get list of projects for teacher
   useEffect(() => {
@@ -183,7 +184,8 @@ function ProjectList() {
 }
 
 function NewProject() {
-  const teacherId = window.location.pathname.slice(-1)
+  // Get teaacher id from url
+  const teacherId = window.location.pathname.slice(13)
   // Info collected to create new project
   const [projectTitle, setProjectTitle] = useState('')
   const [projectDescription, setProjectDescription] = useState('')
