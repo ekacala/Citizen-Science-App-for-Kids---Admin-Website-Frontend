@@ -70,6 +70,7 @@ function ProjectList() {
   const [projects, setProjects] = useState<project[]>([]);
   const [loaded, setLoaded] = useState(false)
   const [emptyProjects, setEmptyProjects] = useState(true)
+  const [projectId, setProjectId] = useState('')
   
   const teacher_id = window.location.pathname.slice(-1)
 
@@ -97,20 +98,27 @@ function ProjectList() {
     );
   }
 
-  const deleteProject = (event: FormEvent<HTMLFormElement>, project_id: string) => {
+  function deleteConfirmation(event: any, project_id: string) {
+    event.preventDefault()
+    setProjectId(project_id)
+    const confirmation = document.getElementById('confirmation-box')
+    confirmation!.classList.toggle('show')
+}
+
+  const deleteProject = (event: any) => {
     event.preventDefault()
     console.log('click')
 
     try {
       // Send POST request
-      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${project_id}`, {
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}`, {
       method: 'DELETE',
       credentials: 'include',
     })
     .then((res) => res.json())
       .then((json) => {
         console.log(json)
-        const updatedProjects = projects.filter(project => project.project_id !== project_id)
+        const updatedProjects = projects.filter(project => project.project_id !== projectId)
         setProjects(updatedProjects)
         })  
     } catch (error) {
@@ -118,6 +126,7 @@ function ProjectList() {
       alert('Failed to submit form.');
       console.log('error block')
     }
+    deleteConfirmation(event, '')
   }
 
   /* Returns the html for the project list page.*/
@@ -130,7 +139,7 @@ function ProjectList() {
       <a className='dropdown-button' onClick={logoutAccount}><p>Logout</p></a>
       <p>Delete Account</p>
     </div>
-    <h1>Projects</h1>
+    <h1 id='project-title'>Projects</h1>
     {emptyProjects ? (
       <p>Welcome! Please create a new project to get started.</p>
     ) : (
@@ -151,7 +160,7 @@ function ProjectList() {
               <td>{project.project_description}</td>
               <td>{project.project_code}</td>
               <td>
-                <form onSubmit={(event) => deleteProject(event, project.project_id)}>
+                <form onSubmit={(event) => deleteConfirmation(event, project.project_id)}>
                   <button type='submit' id='delete-project-button'>Delete</button>
                 </form>
               </td>
@@ -163,6 +172,12 @@ function ProjectList() {
     </div>
     )}
     <button onClick={() => addProject(teacher_id)} id='new-project-button'>Create A New Project</button>
+    <div id='confirmation-box' className='hide'>
+      <h2>Are you sure you want to delete this project?</h2>
+      <p>All information for this project including student observations will be deleted if you do.</p>
+      <button className='confirmation-box-button' onClick={(event) => deleteProject(event)}>Yes</button>
+      <button className='confirmation-box-button' onClick={(event) => deleteConfirmation(event, '')}>No</button>
+    </div>
     </>
   )
 }

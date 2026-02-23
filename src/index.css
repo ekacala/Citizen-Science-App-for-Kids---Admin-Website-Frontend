@@ -93,9 +93,13 @@ th, td {
 
 /*----- Project List Page -----*/
 
+#project-title {
+  margin-top: 0;
+}
+
 #menu {
-  position: fixed;
-  right: 3vw;
+  position: relative;
+  left: 48%;
 }
 
 #menu-button-img {
@@ -116,9 +120,9 @@ th, td {
   border-radius: 10px;
   background-color: #3AE070;
   width: 200px;
-  position: fixed;
-  right: 3vw;
-  top: 11vh;
+  position: absolute;
+  right: 45px;
+  top: 10%;
 }
 
 .dropdown-button:hover {
@@ -130,7 +134,7 @@ th, td {
 }
 
 .show {
-  display: block;
+  display: inline-block;
 }
 
 #project-list-table {
@@ -181,6 +185,31 @@ th, td {
   cursor: pointer;
   transition: border-color 0.25s;
   background-color: #eee;
+}
+
+#confirmation-box {
+  background-color: #eee;
+  border: solid 5px #3AE070;
+  width: 400px;
+  padding: 30px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.confirmation-box-button {
+  border-radius: 5px;
+  border: 1px solid transparent;
+  padding: 0.5em 1em;
+  margin: 0 20px;
+  width: 75px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  background-color: #E05B3A;
 }
 
 /*----- Create New Project -----*/
