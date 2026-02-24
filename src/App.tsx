@@ -477,7 +477,6 @@ function ProjectResults() {
       .then((res) => res.json())
       .then((json) => {
         const observationsArray = json.data 
-        console.log(observationsArray)
         setProjectObservations(observationsArray)
       })
   }, [loaded]);
@@ -487,6 +486,44 @@ function ProjectResults() {
         <h1>Loading...</h1>
       </div>
     );
+  }
+
+  const createDownloadLink = (blob: Blob, filename: string) => {
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a temporary anchor element
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = filename; // Set the desired file name
+
+    // Append anchor to body, click it, and remove it
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up the temporary URL and element
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  const downloadSVG = (event: any) => {
+    event.preventDefault()
+
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/export/csv`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+    .then((res) => res.blob())
+      .then((blob) => {
+        createDownloadLink(blob, 'test') // Need to figure out how to grab filename from response
+        })  
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
   }
 
   /* Returns the html for the project results page. */
@@ -525,7 +562,7 @@ function ProjectResults() {
       <button>Edit Project Details</button>
       <button>Add New Fields</button>
       <button>Create Me a Graph</button>
-      <button>Download Data</button>
+      <button onClick={downloadSVG}>Download Data</button>
     </div>
     </>
   )
