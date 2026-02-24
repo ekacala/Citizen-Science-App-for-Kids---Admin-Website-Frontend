@@ -423,6 +423,25 @@ function ProjectResults() {
   const [projectDescription, setProjectDescription] = useState('')
   const [projectInstructions, setProjectInstructions] =useState('')
 
+  // Setup data needed to display project fields from array
+  interface field {
+    field_id: string
+    field_name: string
+  }
+  const [projectFields, setProjectFields] = useState<field[]>([])
+
+  // Setup data needed to display project observations from array
+  interface observation {
+    observaton_id: string
+    student_name: string
+    field_data: [{
+      data_id: string
+      field_name: string
+      field_value: string
+    }]
+  }
+  const [projectObservations, setProjectObservations] = useState<observation[]>([])
+
   // Get details of project
   useEffect(() => {
     // Get project
@@ -433,12 +452,12 @@ function ProjectResults() {
       .then((res) => res.json())
       .then((json) => {
         const projectArray = json.data
+       // console.log(projectArray)
         setProjectTitle(projectArray.project_title)
         setProjectCode(projectArray.project_code)
         setProjectDescription(projectArray.project_description)
         setProjectInstructions(projectArray.project_instructions)
         setLoaded(true)
-        //console.log(projectArray)
       })
     // Get fields
     fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
@@ -448,7 +467,19 @@ function ProjectResults() {
       .then((res) => res.json())
       .then((json) => {
         const fieldsArray = json.data 
-        console.log(fieldsArray)
+       // console.log(fieldsArray)
+        setProjectFields(fieldsArray)
+      })
+    // Get observations
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/observations`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const observationsArray = json.data 
+        console.log(observationsArray)
+        setProjectObservations(observationsArray)
       })
   }, [loaded]);
   if (!loaded) {
@@ -465,6 +496,7 @@ function ProjectResults() {
     <h1>Project Results</h1>
     <button onClick={() => projectPage(teacherId)}>Back</button>
     <div id='project-details'>
+      <h2>Project Details</h2>
       <p>Title: {projectTitle}</p>
       <p>Code: {projectCode}</p>
       <p>Description: {projectDescription}</p>
@@ -475,31 +507,20 @@ function ProjectResults() {
         <thead>
           <tr>
             <td>Student</td>
-            <td>Day of the Week</td>
-            <td>Number of Bees</td>
+            {projectFields.map((field) => (
+            <td key={field.field_id}>{field.field_name}</td>
+            ))}
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Jimmy</td>
-            <td>Monday</td>
-            <td>3</td>
+          {projectObservations.map((observation) => (
+          <tr key={observation.observaton_id}>
+            <td>{observation.student_name}</td>
+            {observation.field_data.map((obv) => (
+              <td key={obv.data_id}>{obv.field_value}</td>
+            ))}
           </tr>
-          <tr>
-            <td>Kim</td>
-            <td>Monday</td>
-            <td>2</td>
-          </tr>
-          <tr>
-            <td>Jimmy</td>
-            <td>Tuesday</td>
-            <td>4</td>
-          </tr>
-          <tr>
-            <td>Kim</td>
-            <td>Tuesday</td>
-            <td>5</td>
-          </tr>
+          ))}
         </tbody>
       </table>
       <button>Create Me a Graph</button>
