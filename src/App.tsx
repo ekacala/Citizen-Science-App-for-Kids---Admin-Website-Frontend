@@ -1,12 +1,11 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { Controller, useForm, useWatch, useFieldArray, type SubmitHandler } from 'react-hook-form'
+import { useForm, useWatch, useFieldArray } from 'react-hook-form'
 import './App.css' 
 import { addProject, logoutAccount, projectDetailsPage, projectPage } from './components/navigation'
 import { dropdownMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
 import googleIcon from './assets/google-logo.svg'
-//import { stringify } from 'querystring'
 
 function Login() {
   /* Returns the html for the login page */
@@ -523,8 +522,10 @@ function ProjectResults() {
           ))}
         </tbody>
       </table>
+      <button>Edit Project Details</button>
+      <button>Add New Fields</button>
       <button>Create Me a Graph</button>
-      <button>Download SVG</button>
+      <button>Download Data</button>
     </div>
     </>
   )

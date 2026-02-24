@@ -298,3 +298,8 @@ input {
   width: 110px;
   margin: 0 auto;
 }
+
+/*----- Project Results -----*/
+#project-results-table {
+  margin: 0 auto;
+}
