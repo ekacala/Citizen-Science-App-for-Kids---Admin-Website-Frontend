@@ -239,12 +239,12 @@ function NewProject() {
 
   // Convert field_options from json to plain array
   const convertJson = (data: any) => {
-    let fieldOptionsArray = []
+    const fieldOptionsArray = []
     if (data.field_options[0]['option'] == '') {
       delete data['field_options']
       return data
     } else {
-    for (let d in data.field_options) {
+    for (const d in data.field_options) {
      fieldOptionsArray.push(data.field_options[d]['option'])
      //console.log(data.field_options[d]['option'])
     }
