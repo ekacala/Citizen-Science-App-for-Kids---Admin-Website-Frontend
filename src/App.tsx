@@ -488,6 +488,7 @@ function ProjectResults() {
     );
   }
 
+  // Create SVG download for user
   const createDownloadLink = (blob: Blob, filename: string) => {
     const url = window.URL.createObjectURL(blob);
 
@@ -506,24 +507,22 @@ function ProjectResults() {
     document.body.removeChild(a);
   }
 
-  const downloadSVG = (event: any) => {
-    event.preventDefault()
-
-    try {
-      // Send POST request
-      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/export/csv`, {
+  // Helper function to get SVG file from backen
+  const downloadSVG = async () => {
+    console.log('click')
+    const response = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/export/csv`, {
       method: 'GET',
       credentials: 'include',
     })
-    .then((res) => res.blob())
-      .then((blob) => {
-        createDownloadLink(blob, 'test') // Need to figure out how to grab filename from response
-        })  
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit form.');
-      console.log('error block')
-    }
+    // Get filename from header
+    const header = response.headers.get('Content-Disposition')
+    const splitHeader = header!.split('filename=')
+    const title = splitHeader[1]
+
+    // get blob data
+    const blobData = await response.blob()
+
+    createDownloadLink(blobData, title)
   }
 
   /* Returns the html for the project results page. */
