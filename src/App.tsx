@@ -207,13 +207,13 @@ function NewProject() {
     field_name: string
     field_type: string
     field_label: string
-    field_options: {option: string}[]
+    field_options?: {option: string}[]
     field_required: null
   }
 
   // Remove any blank values
   const cleanData = (data: object) => {
-    console.log(data)
+    //console.log(data)
     return Object.fromEntries(
       Object.entries(data).filter(([value]) => value !== '')
     )
@@ -238,9 +238,11 @@ function NewProject() {
   })
 
   // Convert field_options from json to plain array
-  const convertJson = (data: any) => {
+
+  const convertJson = (data: {[k: string]:any}) => {
+    //console.log(data)
     const fieldOptionsArray = []
-    if (data.field_options[0]['option'] == '') {
+    if (data.field_options![0]['option'] == '') {
       delete data['field_options']
       return data
     } else {
@@ -269,10 +271,9 @@ function NewProject() {
   })
 
   // Submit form to create new fields for a project
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FormData) => {
     const cleanedData = cleanData(data)
     const convertedData = convertJson(cleanedData)
-    console.log(convertedData)
     try {
       // Send POST request
       fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
@@ -318,7 +319,6 @@ function NewProject() {
       project_description: projectDescription,
       project_instructions: projectInstructions
     }
-    console.log(data)
 
     try {
       // Send POST request
