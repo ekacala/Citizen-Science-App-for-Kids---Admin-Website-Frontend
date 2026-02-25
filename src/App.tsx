@@ -212,7 +212,7 @@ function NewProject() {
   }
 
   // Remove any blank values
-  const cleanData = (data: {}) => {
+  const cleanData = (data: object) => {
     console.log(data)
     return Object.fromEntries(
       Object.entries(data).filter(([value]) => value !== '')
@@ -230,8 +230,7 @@ function NewProject() {
     reset,
     control,
     handleSubmit,
-    setValue,
-    formState: { errors, isSubmitSuccessful },
+    formState: { isSubmitSuccessful },
   } = useForm<FormData>({
     defaultValues: {
       field_options: [{option: ''}]
