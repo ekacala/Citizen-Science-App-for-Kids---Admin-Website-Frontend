@@ -89,7 +89,7 @@ function ProjectList() {
         }
         setLoaded(true);
       })
-  }, [loaded]);
+  }, [loaded, projects.length, teacher_id]);
   if (!loaded) {
     return (
       <div>
@@ -98,14 +98,14 @@ function ProjectList() {
     );
   }
 
-  function deleteConfirmation(event: any, project_id: string) {
+  function deleteConfirmation(event: FormEvent<HTMLFormElement>, project_id: string) {
     event.preventDefault()
     setProjectId(project_id)
     const confirmation = document.getElementById('confirmation-box')
     confirmation!.classList.toggle('show')
 }
 
-  const deleteProject = (event: any) => {
+  const deleteProject = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     console.log('click')
 
@@ -175,8 +175,14 @@ function ProjectList() {
     <div id='confirmation-box' className='hide'>
       <h2>Are you sure you want to delete this project?</h2>
       <p>All information for this project including student observations will be deleted if you do.</p>
-      <button className='confirmation-box-button' onClick={(event) => deleteProject(event)}>Yes</button>
-      <button className='confirmation-box-button' onClick={(event) => deleteConfirmation(event, '')}>No</button>
+      <div id='confirmation-box-button-box'>
+        <form onSubmit={(event) => deleteProject(event)}>
+          <button className='confirmation-box-button'>Yes</button>
+        </form>
+        <form onSubmit={(event) => deleteConfirmation(event, '')}>
+          <button className='confirmation-box-button'>No</button>
+        </form>
+      </div>
     </div>
     </>
   )
@@ -206,9 +212,10 @@ function NewProject() {
   }
 
   // Remove any blank values
-  const cleanData = (data: any) => {
+  const cleanData = (data: {}) => {
+    console.log(data)
     return Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value !== '')
+      Object.entries(data).filter(([value]) => value !== '')
     )
   }
 
@@ -528,16 +535,16 @@ function ProjectResults() {
   /* Returns the html for the project results page. */
   return (
     <>
-    <h1>Project Results</h1>
+    <h1>{projectTitle}</h1>
     <button onClick={() => projectPage(teacherId)}>Back</button>
     <div id='project-details'>
       <h2>Project Details</h2>
-      <p>Title: {projectTitle}</p>
-      <p>Code: {projectCode}</p>
+      <p>Access Code: {projectCode}</p>
       <p>Description: {projectDescription}</p>
       <p>Instructions: {projectInstructions}</p>
     </div>
     <div id='project-results'>
+      <h2>Student Observations</h2>
       <table id='project-results-table'>
         <thead>
           <tr>

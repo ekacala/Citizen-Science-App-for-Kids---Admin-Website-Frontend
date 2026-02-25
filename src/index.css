@@ -198,6 +198,12 @@ th, td {
   transform: translate(-50%, -50%);
 }
 
+#confirmation-box-button-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 .confirmation-box-button {
   border-radius: 5px;
   border: 1px solid transparent;
