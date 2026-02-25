@@ -238,7 +238,7 @@ function NewProject() {
   })
 
   // Convert field_options from json to plain array
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const convertJson = (data: {[k: string]:any}) => {
     //console.log(data)
     const fieldOptionsArray = []
