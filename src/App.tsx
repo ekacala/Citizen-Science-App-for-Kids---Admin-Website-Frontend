@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useForm, useWatch, useFieldArray } from 'react-hook-form'
 import './App.css' 
-import { addProject, logoutAccount, projectDetailsPage, projectPage } from './components/navigation'
+import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage } from './components/navigation'
 import { dropdownMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
@@ -191,16 +191,17 @@ function ProjectList() {
 function NewProject() {
   // Get teaacher id from url
   const teacherId = window.location.pathname.slice(13)
+
   // Info collected to create new project
   const [projectTitle, setProjectTitle] = useState('')
   const [projectDescription, setProjectDescription] = useState('')
   const [projectInstructions, setProjectInstructions] = useState('')
 
-  // Info collected to add data fields to a project
-  const [projectId, setProjectId] = useState('-1')
-
   // Track progress through form
   const [projectCreated, setProjectCreated] = useState(false)
+
+  // Info collected to add data fields to a project
+  const [projectId, setProjectId] = useState('-1')
 
   // Define FormData types for fields form
   type FormData = {
@@ -413,6 +414,163 @@ function NewProject() {
   )
 }
 
+function NewFields() {
+  // Get teacherId and projectId
+  const idNums = window.location.pathname.slice(12)
+  const idList = idNums.split('/')
+  const teacherId = idList[0]
+  const projectId = idList[1]
+
+  // Define FormData types for fields form
+  type FormData = {
+    field_name: string
+    field_type: string
+    field_label: string
+    field_options?: {option: string}[]
+    field_required: null
+  }
+
+  // Remove any blank values
+  const cleanData = (data: object) => {
+    //console.log(data)
+    return Object.fromEntries(
+      Object.entries(data).filter(([value]) => value !== '')
+    )
+  }
+
+  // Convert is_required to boolean
+  const parseBoolean = (value: string) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+  }
+
+  const {
+    register,
+    reset,
+    control,
+    handleSubmit,
+    formState: { isSubmitSuccessful },
+  } = useForm<FormData>({
+    defaultValues: {
+      field_options: [{option: ''}]
+    }
+  })
+
+  // Convert field_options from json to plain array
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const convertJson = (data: {[k: string]:any}) => {
+    //console.log(data)
+    const fieldOptionsArray = []
+    if (data.field_options![0]['option'] == '') {
+      delete data['field_options']
+      return data
+    } else {
+    for (const d in data.field_options) {
+     fieldOptionsArray.push(data.field_options[d]['option'])
+     //console.log(data.field_options[d]['option'])
+    }
+    data.field_options = fieldOptionsArray
+    //data.field_options = ['1']
+   // console.log(fieldOptionsArray)
+    return data
+    }
+  }
+
+  // Disable field_options input if field_type is radio or checkbox
+  const watchFieldType = useWatch({control, name: 'field_type', defaultValue: 'text'})
+  const isOptionsDisabled = watchFieldType?.includes('text') ||
+    watchFieldType?.includes('textarea') ||
+    watchFieldType?.includes('number') ||
+    watchFieldType?.includes('date') ||
+    watchFieldType?.includes('time')
+
+  const {fields, append, remove} = useFieldArray({
+    control,
+    name: 'field_options'
+  })
+
+  // Submit form to create new fields for a project
+  const onSubmit = async (data: FormData) => {
+    const cleanedData = cleanData(data)
+    const convertedData = convertJson(cleanedData)
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(convertedData)
+    })
+    .then((res) => res.json())
+      .then((json) => {
+        console.log(json)
+        })
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
+  }
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset()
+    }
+  })
+  return (
+  <>
+    <h1>Create New Fields</h1>
+    <div id='add-data'>
+      <form onSubmit={handleSubmit(onSubmit)} id='add-data-form'>
+        <label htmlFor='field_name'>Name: </label>
+        {/*<input type='text' id='field_name' name='field_name' value={projectFieldName} onChange={(event) => setProjectFieldName(event.target.value)}></input><br/>*/}
+        <input type='text' id='field_name' defaultValue={''} {...register('field_name')} ></input><br/>
+
+        <label htmlFor='field_label'>Label: </label>
+        <input type='text' id='field_label' defaultValue={''} {...register('field_label')}></input><br/>
+
+        <label htmlFor='field_type'>Type: </label>
+        <select id='field_type' defaultValue={'text'} {...register('field_type')}>
+          <option value={'text'}>Single Line Text</option>
+          <option value={'textarea'}>Multi Line Paragraph</option>
+          <option value={'number'}>Number</option>
+          <option value={'date'}>Date</option>
+          <option value={'time'}>Time</option>
+          <option value={'checkbox'}>Checkbox</option>
+          <option value={'radio'}>Multiple Choice</option>
+        </select><br/>
+
+        <label htmlFor='field_options'>Options: </label>
+        <ul id='field-options-list'>
+          {fields.map((field, index) => (
+            <li key={field.id}>
+              <input type='text' id='field_options' defaultValue={''} {...register(`field_options.${index}.option`)} disabled = {isOptionsDisabled}></input>
+              <button type='button' className='delete-field-option-button' onClick={() => remove(index)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+
+        <button id='add-field-option-button' type='button' onClick={() => append({option: ''})}>Add Option</button>
+
+        <label htmlFor='field_required'>Is this data point required? </label>
+        <select id='field_required' defaultValue={''} {...register('field_required', { setValueAs: parseBoolean })}>
+          <option value={'false'}>No</option>
+          <option value={'true'}>Yes</option>
+          
+        </select><br/>
+
+        <input type='submit' value={'Add Data Point'} id='field-submit' name='field_submit'></input>
+
+        <button id='exit-create-data-button' onClick={() => projectDetailsPage(teacherId, projectId)}>I'm Done Adding Data Points</button>
+      </form>
+      
+    </div>
+    </>
+  )
+}
+
 
 function ProjectResults() {
   // Get teacherId and projectId
@@ -472,7 +630,7 @@ function ProjectResults() {
       .then((res) => res.json())
       .then((json) => {
         const fieldsArray = json.data 
-       // console.log(fieldsArray)
+        console.log(fieldsArray)
         setProjectFields(fieldsArray)
       })
     // Get observations
@@ -484,6 +642,7 @@ function ProjectResults() {
       .then((json) => {
         const observationsArray = json.data 
         setProjectObservations(observationsArray)
+        console.log(observationsArray)
       })
   }, [loaded, projectId]);
   if (!loaded) {
@@ -554,10 +713,10 @@ function ProjectResults() {
           </tr>
         </thead>
         <tbody>
-          {projectObservations.map((observation) => (
+           {projectObservations.map((observation) => (
           <tr key={observation.observaton_id}>
             <td>{observation.student_name}</td>
-            {observation.field_data.map((obv) => (
+           {observation.field_data.map((obv) => (
               <td key={obv.data_id}>{obv.field_value}</td>
             ))}
           </tr>
@@ -565,7 +724,7 @@ function ProjectResults() {
         </tbody>
       </table>
       <button>Edit Project Details</button>
-      <button>Add New Fields</button>
+      <button onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
       <button>Create Me a Graph</button>
       <button onClick={downloadSVG}>Download Data</button>
     </div>
@@ -573,4 +732,4 @@ function ProjectResults() {
   )
 }
 
-export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults};
+export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields};

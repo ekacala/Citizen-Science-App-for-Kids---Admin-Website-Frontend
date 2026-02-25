@@ -99,7 +99,8 @@ th, td {
 
 #menu {
   position: relative;
-  left: 48%;
+  left: 93%;
+  width: 50px;
 }
 
 #menu-button-img {
