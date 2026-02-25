@@ -485,7 +485,7 @@ function ProjectResults() {
         const observationsArray = json.data 
         setProjectObservations(observationsArray)
       })
-  }, [loaded]);
+  }, [loaded, projectId]);
   if (!loaded) {
     return (
       <div>
