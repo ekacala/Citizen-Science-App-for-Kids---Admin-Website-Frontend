@@ -807,7 +807,7 @@ function ProjectResults() {
       <table id='project-results-table'>
         <thead>
           <tr>
-            <td>Student</td>
+            {/*<td>Student</td>*/}
             {projectFields.map((field) => (
             <td key={field.field_id}>{field.field_name}</td>
             ))}
@@ -816,7 +816,7 @@ function ProjectResults() {
         <tbody>
            {projectObservations.map((observation) => (
           <tr key={observation.observaton_id}>
-            <td>{observation.student_name}</td>
+            {/*<td>{observation.student_name}</td>*/}
            {observation.field_data.map((obv) => (
               <td key={obv.data_id}>{obv.field_value}</td>
             ))}
