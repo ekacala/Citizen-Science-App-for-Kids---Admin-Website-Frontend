@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useForm, useWatch, useFieldArray } from 'react-hook-form'
 import './App.css' 
-import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage } from './components/navigation'
+import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage, editProjectPage } from './components/navigation'
 import { dropdownMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
@@ -467,11 +467,8 @@ function NewFields() {
     } else {
     for (const d in data.field_options) {
      fieldOptionsArray.push(data.field_options[d]['option'])
-     //console.log(data.field_options[d]['option'])
     }
     data.field_options = fieldOptionsArray
-    //data.field_options = ['1']
-   // console.log(fieldOptionsArray)
     return data
     }
   }
@@ -525,7 +522,6 @@ function NewFields() {
     <div id='add-data'>
       <form onSubmit={handleSubmit(onSubmit)} id='add-data-form'>
         <label htmlFor='field_name'>Name: </label>
-        {/*<input type='text' id='field_name' name='field_name' value={projectFieldName} onChange={(event) => setProjectFieldName(event.target.value)}></input><br/>*/}
         <input type='text' id='field_name' defaultValue={''} {...register('field_name')} ></input><br/>
 
         <label htmlFor='field_label'>Label: </label>
@@ -565,6 +561,111 @@ function NewFields() {
 
         <button id='exit-create-data-button' onClick={() => projectDetailsPage(teacherId, projectId)}>I'm Done Adding Data Points</button>
       </form>
+      
+    </div>
+    </>
+  )
+}
+
+function EditProject() {
+  // Get teacherId and projectId
+  const idNums = window.location.pathname.slice(14)
+  const idList = idNums.split('/')
+  const teacherId = idList[0]
+  const projectId = idList[1]
+
+
+  // Store project details
+  const [projectTitle, setProjectTitle] = useState('')
+  const [projectDescription, setProjectDescription] = useState('')
+  const [projectInstructions, setProjectInstructions] =useState('')
+
+  const [loaded, setLoaded] = useState(false)
+
+  // Define FormData types for fields form
+  type FormData = {
+    project_title: string
+    project_description: string
+    project_instructions: string
+  }
+
+  // Get project and set project values
+  useEffect(() => {
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const projectArray = json.data
+        console.log(projectArray)
+        setProjectTitle(projectArray.project_title)
+        setProjectDescription(projectArray.project_description)
+        setProjectInstructions(projectArray.project_instructions)
+        setLoaded(true)
+      })
+  }, [loaded, projectId]);
+
+  // Remove any blank values
+  const cleanData = (data: object) => {
+    return Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== '')
+    )
+  }
+
+  const {
+    register,
+    handleSubmit,
+  } = useForm<FormData>({
+  })
+
+  // Submit form to edit details for a project
+  const onSubmit = async (data: FormData) => {
+    const cleanedData = cleanData(data)
+    // Check if no values have been changed
+    if (Object.keys(cleanedData).length == 0) {
+      alert('Please edit at least one value')
+      return
+    }
+    console.log(cleanedData)
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cleanedData)
+      
+    })
+    .then(() => (
+      projectDetailsPage(teacherId, projectId)
+    ))
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
+  }
+
+  return (
+    <>
+    <h1>Edit {projectTitle}</h1>
+    <div id='add-data'>
+      <form onSubmit={handleSubmit(onSubmit)} id='add-data-form'>
+        <label htmlFor='project_title'>title: </label>
+        <input type='text' id='project_title' defaultValue={projectTitle} {...register('project_title')} ></input><br/>
+
+        <label htmlFor='project_description'>Description: </label>
+        <textarea id='project_description' defaultValue={projectDescription} {...register('project_description')}></textarea><br/>
+
+        <label htmlFor='project_instructions'>Instructions: </label>
+        <textarea id='project_instructions' defaultValue={projectInstructions} {...register('project_instructions')}></textarea><br/>
+
+        <input type='submit' value={'Edit Project'} id='field-submit' name='field_submit'></input>
+      </form>
+      <button onClick={() => projectDetailsPage(teacherId, projectId)}>Cancel</button>
       
     </div>
     </>
@@ -723,7 +824,7 @@ function ProjectResults() {
           ))}
         </tbody>
       </table>
-      <button>Edit Project Details</button>
+      <button onClick={() => editProjectPage(teacherId, projectId)}>Edit Project Details</button>
       <button onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
       <button>Create Me a Graph</button>
       <button onClick={downloadSVG}>Download Data</button>
@@ -732,4 +833,4 @@ function ProjectResults() {
   )
 }
 
-export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields};
+export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields, EditProject};

@@ -30,4 +30,8 @@ function newFieldsPage(teacher_id: string, project_id: string) {
   window.location.href = url + 'add-fields/' + teacher_id + '/' + project_id
 }
 
-export {addProject, projectPage, logoutAccount, projectDetailsPage, newFieldsPage}
+function editProjectPage(teacher_id: string, project_id: string) {
+  window.location.href = url + 'edit-project/' + teacher_id + '/' + project_id
+}
+
+export {addProject, projectPage, logoutAccount, projectDetailsPage, newFieldsPage, editProjectPage}
