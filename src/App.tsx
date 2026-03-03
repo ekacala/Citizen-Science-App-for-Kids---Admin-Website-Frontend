@@ -263,7 +263,7 @@ function NewProject() {
     }
   }
 
-  // Disable field_options input if field_type is radio or checkbox
+  // Disable field_options input if field_type is radio or multiselect
   const watchFieldType = useWatch({control, name: 'field_type', defaultValue: 'text'})
   const isOptionsDisabled = watchFieldType?.includes('text') ||
     watchFieldType?.includes('textarea') ||
@@ -384,7 +384,7 @@ function NewProject() {
           <option value={'number'}>Number</option>
           <option value={'date'}>Date</option>
           <option value={'time'}>Time</option>
-          <option value={'checkbox'}>Checkbox</option>
+          <option value={'multiselect'}>Multiselect</option>
           <option value={'radio'}>Multiple Choice</option>
         </select><br/>
 
@@ -478,7 +478,7 @@ function NewFields() {
     }
   }
 
-  // Disable field_options input if field_type is radio or checkbox
+  // Disable field_options input if field_type is radio or multiselect
   const watchFieldType = useWatch({control, name: 'field_type', defaultValue: 'text'})
   const isOptionsDisabled = watchFieldType?.includes('text') ||
     watchFieldType?.includes('textarea') ||
@@ -539,7 +539,7 @@ function NewFields() {
           <option value={'number'}>Number</option>
           <option value={'date'}>Date</option>
           <option value={'time'}>Time</option>
-          <option value={'checkbox'}>Checkbox</option>
+          <option value={'multiselect'}>Multiselect</option>
           <option value={'radio'}>Multiple Choice</option>
         </select><br/>
 
@@ -765,15 +765,14 @@ function ProjectResults() {
         setProjectFields(fieldsArray)
       })
     // Get observations
-    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/observations`, {
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/observations?format=string`, {
       method: 'GET',
       credentials: 'include'
     })
       .then((res) => res.json())
       .then((json) => {
-        const observationsArray = json.data 
+        const observationsArray = json.data
         setProjectObservations(observationsArray)
-        //console.log(observationsArray)
       })
     // Get graph info
     fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/stats`, {
@@ -795,7 +794,7 @@ function ProjectResults() {
     );
   }
 
-  // Create SVG download for user
+  // Create CSV download for user
   const createDownloadLink = (blob: Blob, filename: string) => {
     const url = window.URL.createObjectURL(blob);
 
@@ -838,8 +837,8 @@ function ProjectResults() {
   ];
 
   // Generate line graph
-  const buildLineGraph = (lineGraphLabels: any, lineGraphData: any) => {
-    const ctx = document.getElementById('line') as HTMLCanvasElement
+  const buildLineGraph = (lineGraphLabels: any, lineGraphData: any, lineGraphId: string) => {
+    const ctx = document.getElementById(lineGraphId) as HTMLCanvasElement
     new Chart(ctx, {
       type: 'line',
       data: {
@@ -864,8 +863,8 @@ function ProjectResults() {
   }
 
   // Generate pie graph
-  const buildPieGraph = (pieGraphLabels: any, pieGraphData: any) => {
-    const ctx = document.getElementById('pie') as HTMLCanvasElement
+  const buildPieGraph = (pieGraphLabels: any, pieGraphData: any, pieGraphId: string) => {
+    const ctx = document.getElementById(pieGraphId) as HTMLCanvasElement
     new Chart(ctx, {
       type: 'doughnut',
       data: {
@@ -887,6 +886,7 @@ function ProjectResults() {
   // Process data to build charts
   const buildCharts = () => {
     console.log(graphFields)
+    console.log(projectObservations)
     let lineGraphData = []
     let lineGraphLabels = []
     let pieGraphData = []
@@ -898,7 +898,7 @@ function ProjectResults() {
           lineGraphLabels.push(graphFields[f].stats.timeline[t].date)
           lineGraphData.push(graphFields[f].stats.timeline[t].count)
         }
-        buildLineGraph(lineGraphLabels, lineGraphData)
+        buildLineGraph(lineGraphLabels, lineGraphData, graphFields[f].field_id.toString())
         
       } else if (graphFields[f].chart_type == 'bar') {
         setShowNumericCard(true)
@@ -907,7 +907,7 @@ function ProjectResults() {
           pieGraphLabels.push(graphFields[f].stats.frequency[t].value)
           pieGraphData.push(graphFields[f].stats.frequency[t].count)
         }
-        buildPieGraph(pieGraphLabels, pieGraphData)
+        buildPieGraph(pieGraphLabels, pieGraphData, graphFields[f].field_id.toString())
       } else if (graphFields[f].chart_type == 'none') {
         setShowNumericCard(true)
       }
@@ -955,11 +955,11 @@ function ProjectResults() {
     
     {graphFields.map((graph) => (
       graph.chart_type == 'line' ? (
-        <div id='graph-box'>
-          <canvas id={graph.chart_type}></canvas>
+        <div key={graph.field_id} id='graph-box'>
+          <canvas id={graph.field_id.toString()}></canvas>
         </div>
       ) : graph.chart_type == 'bar' && showNumericCard ? (
-        <div>
+        <div key={graph.field_id}>
           <div className="num-cell span2">
             <div className="num-cell-val">{graph.stats.mean}</div>
             <div className="num-cell-lbl">Average</div>
@@ -975,18 +975,18 @@ function ProjectResults() {
           
         </div>
       ) : graph.chart_type == 'pie' ? (
-        <div id='graph-box'>
-          <canvas id={graph.chart_type}></canvas>
+        <div key={graph.field_id} id='graph-box'>
+          <canvas id={graph.field_id.toString()}></canvas>
         </div>
       ) : graph.chart_type == 'none' && showNumericCard ? (
-        <div>
+        <div key={graph.field_id}>
           <div className="num-cell">
             <div className="num-cell-val">{graph.stats.count}</div>
             <div className="num-cell-lbl">Count</div>
           </div>
         </div>
       ) : (
-        <div></div>
+        <div key={graph.field_id}></div>
       )))}
     </>
   )
