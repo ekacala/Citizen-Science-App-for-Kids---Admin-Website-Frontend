@@ -269,7 +269,8 @@ function NewProject() {
     watchFieldType?.includes('textarea') ||
     watchFieldType?.includes('number') ||
     watchFieldType?.includes('date') ||
-    watchFieldType?.includes('time')
+    watchFieldType?.includes('time') ||
+    watchFieldType?.includes('checkbox')
 
   const {fields, append, remove} = useFieldArray({
     control,
@@ -384,6 +385,7 @@ function NewProject() {
           <option value={'number'}>Number</option>
           <option value={'date'}>Date</option>
           <option value={'time'}>Time</option>
+          <option value={'checkbox'}>True/False</option>
           <option value={'multiselect'}>Multiselect</option>
           <option value={'radio'}>Multiple Choice</option>
         </select><br/>
@@ -484,7 +486,8 @@ function NewFields() {
     watchFieldType?.includes('textarea') ||
     watchFieldType?.includes('number') ||
     watchFieldType?.includes('date') ||
-    watchFieldType?.includes('time')
+    watchFieldType?.includes('time') ||
+    watchFieldType?.includes('checkbox')
 
   const {fields, append, remove} = useFieldArray({
     control,
@@ -539,6 +542,7 @@ function NewFields() {
           <option value={'number'}>Number</option>
           <option value={'date'}>Date</option>
           <option value={'time'}>Time</option>
+          <option value={'checkbox'}>True/False</option>
           <option value={'multiselect'}>Multiselect</option>
           <option value={'radio'}>Multiple Choice</option>
         </select><br/>
@@ -856,7 +860,7 @@ function ProjectResults() {
         },
         scales: {
           x: { grid: { color: '#30363d55' }, ticks: { font: { size: 10 } } },
-          y: { grid: { color: '#30363d55' }, ticks: { stepSize: 1, font: { size: 10 } } }
+          y: {beginAtZero: true, grid: { color: '#30363d55' }, ticks: { stepSize: 1, font: { size: 10 } } }
         }
       }
     } as ChartConfiguration);
