@@ -751,7 +751,6 @@ function ProjectResults() {
       .then((res) => res.json())
       .then((json) => {
         const projectArray = json.data
-       // console.log(projectArray)
         setProjectTitle(projectArray.project_title)
         setProjectCode(projectArray.project_code)
         setProjectDescription(projectArray.project_description)
@@ -765,7 +764,6 @@ function ProjectResults() {
       .then((res) => res.json())
       .then((json) => {
         const fieldsArray = json.data 
-        //console.log(fieldsArray)
         setProjectFields(fieldsArray)
       })
     // Get observations
@@ -834,7 +832,7 @@ function ProjectResults() {
     createDownloadLink(blobData, title)
   }
 
-  //let showNumericCard = false
+  // Create color palette for pie charts
   const palette = [
     '#39d353','#58a6ff','#ffa657','#f78166','#bc8cff',
     '#39c5cf','#e3b341','#db61a2','#79c0ff','#56d364'
@@ -890,7 +888,6 @@ function ProjectResults() {
   // Process data to build charts
   const buildCharts = () => {
     console.log(graphFields)
-    console.log(projectObservations)
     let lineGraphData = []
     let lineGraphLabels = []
     let pieGraphData = []
@@ -904,7 +901,7 @@ function ProjectResults() {
         }
         buildLineGraph(lineGraphLabels, lineGraphData, graphFields[f].field_id.toString())
         
-      } else if (graphFields[f].chart_type == 'bar') {
+      } else if (graphFields[f].chart_type == 'number') {
         setShowNumericCard(true)
       } else if (graphFields[f].chart_type == 'pie') {
         for (const t in graphFields[f].stats.frequency) {
@@ -912,9 +909,7 @@ function ProjectResults() {
           pieGraphData.push(graphFields[f].stats.frequency[t].count)
         }
         buildPieGraph(pieGraphLabels, pieGraphData, graphFields[f].field_id.toString())
-      } else if (graphFields[f].chart_type == 'none') {
-        setShowNumericCard(true)
-      }
+      } 
     }
   }
 
@@ -962,7 +957,7 @@ function ProjectResults() {
         <div key={graph.field_id} id='graph-box'>
           <canvas id={graph.field_id.toString()}></canvas>
         </div>
-      ) : graph.chart_type == 'bar' && showNumericCard ? (
+      ) : graph.chart_type == 'number' && showNumericCard ? (
         <div key={graph.field_id}>
           <div className="num-cell span2">
             <div className="num-cell-val">{graph.stats.mean}</div>
@@ -981,13 +976,6 @@ function ProjectResults() {
       ) : graph.chart_type == 'pie' ? (
         <div key={graph.field_id} id='graph-box'>
           <canvas id={graph.field_id.toString()}></canvas>
-        </div>
-      ) : graph.chart_type == 'none' && showNumericCard ? (
-        <div key={graph.field_id}>
-          <div className="num-cell">
-            <div className="num-cell-val">{graph.stats.count}</div>
-            <div className="num-cell-lbl">Count</div>
-          </div>
         </div>
       ) : (
         <div key={graph.field_id}></div>
