@@ -1,11 +1,16 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useForm, useWatch, useFieldArray } from 'react-hook-form'
+import { RechartsDevtools } from '@recharts/devtools'
+import { Line, LineChart, ResponsiveContainer } from 'recharts'
+import { Chart, registerables, type ChartConfiguration } from 'chart.js'
 import './App.css' 
 import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage, editProjectPage } from './components/navigation'
-import { dropdownMenu } from './components/menu'
+import { dropdownMenu, graphMenu } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
 import googleIcon from './assets/google-logo.svg'
+
+Chart.register(...registerables)
 
 function Login() {
   /* Returns the html for the login page */
@@ -706,6 +711,32 @@ function ProjectResults() {
   }
   const [projectObservations, setProjectObservations] = useState<observation[]>([])
 
+  // Setup data needed to generate a graph
+  interface graph {
+    chart_type: string
+    field_id: number
+    field_label: string
+    field_name: string
+    field_type: string
+    stats: {
+      timeline: [{
+        count: number
+        date: number
+      }]
+      count?: number
+      max?: number
+      mean?: number
+      min?: number
+      frequency: [{
+        count: number
+        value: string
+      }]
+    }
+  }
+
+  const [graphFields, setGraphFields] = useState<graph[]>([])
+  const [showNumericCard, setShowNumericCard] = useState(false)
+
   // Get details of project
   useEffect(() => {
     // Get project
@@ -721,7 +752,6 @@ function ProjectResults() {
         setProjectCode(projectArray.project_code)
         setProjectDescription(projectArray.project_description)
         setProjectInstructions(projectArray.project_instructions)
-        setLoaded(true)
       })
     // Get fields
     fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
@@ -731,7 +761,7 @@ function ProjectResults() {
       .then((res) => res.json())
       .then((json) => {
         const fieldsArray = json.data 
-        console.log(fieldsArray)
+        //console.log(fieldsArray)
         setProjectFields(fieldsArray)
       })
     // Get observations
@@ -743,7 +773,18 @@ function ProjectResults() {
       .then((json) => {
         const observationsArray = json.data 
         setProjectObservations(observationsArray)
-        console.log(observationsArray)
+        //console.log(observationsArray)
+      })
+    // Get graph info
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/stats`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const data = json.data 
+        setGraphFields(data.fields)
+        setLoaded(true)
       })
   }, [loaded, projectId]);
   if (!loaded) {
@@ -773,9 +814,8 @@ function ProjectResults() {
     document.body.removeChild(a);
   }
 
-  // Helper function to get SVG file from backen
-  const downloadSVG = async () => {
-    console.log('click')
+  // Helper function to get CSV file from backen
+  const downloadCSV = async () => {
     const response = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/export/csv`, {
       method: 'GET',
       credentials: 'include',
@@ -789,6 +829,89 @@ function ProjectResults() {
     const blobData = await response.blob()
 
     createDownloadLink(blobData, title)
+  }
+
+  //let showNumericCard = false
+  const palette = [
+    '#39d353','#58a6ff','#ffa657','#f78166','#bc8cff',
+    '#39c5cf','#e3b341','#db61a2','#79c0ff','#56d364'
+  ];
+
+  // Generate line graph
+  const buildLineGraph = (lineGraphLabels: any, lineGraphData: any) => {
+    const ctx = document.getElementById('line') as HTMLCanvasElement
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: lineGraphLabels, datasets: [{
+          label: 'Observations', data: lineGraphData, borderWidth: 1, borderColor: '#ffa657', backgroundColor: '#ffa65722',
+        pointBackgroundColor: '#ffa657', pointRadius: 5, pointHoverRadius: 7,
+        fill: true, tension: 0.35
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: {display: false},
+          tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} observations` } }
+        },
+        scales: {
+          x: { grid: { color: '#30363d55' }, ticks: { font: { size: 10 } } },
+          y: { grid: { color: '#30363d55' }, ticks: { stepSize: 1, font: { size: 10 } } }
+        }
+      }
+    } as ChartConfiguration);
+  }
+
+  // Generate pie graph
+  const buildPieGraph = (pieGraphLabels: any, pieGraphData: any) => {
+    const ctx = document.getElementById('pie') as HTMLCanvasElement
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: pieGraphLabels, datasets: [{
+          label: 'Observations', data: pieGraphData, borderWidth: 1,
+          backgroundColor: palette.slice(0, pieGraphData.length).map(c => c + 'cc'),
+          borderColor: palette.slice(0, pieGraphData.length), hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } }
+        }
+      }
+    } as ChartConfiguration);
+  }
+  
+  // Process data to build charts
+  const buildCharts = () => {
+    console.log(graphFields)
+    let lineGraphData = []
+    let lineGraphLabels = []
+    let pieGraphData = []
+    let pieGraphLabels = []
+    
+    for (const f in graphFields) {
+      if (graphFields[f].chart_type == 'line') {
+        for (const t in graphFields[f].stats.timeline) {
+          lineGraphLabels.push(graphFields[f].stats.timeline[t].date)
+          lineGraphData.push(graphFields[f].stats.timeline[t].count)
+        }
+        buildLineGraph(lineGraphLabels, lineGraphData)
+        
+      } else if (graphFields[f].chart_type == 'bar') {
+        setShowNumericCard(true)
+      } else if (graphFields[f].chart_type == 'pie') {
+        for (const t in graphFields[f].stats.frequency) {
+          pieGraphLabels.push(graphFields[f].stats.frequency[t].value)
+          pieGraphData.push(graphFields[f].stats.frequency[t].count)
+        }
+        buildPieGraph(pieGraphLabels, pieGraphData)
+      } else if (graphFields[f].chart_type == 'none') {
+        setShowNumericCard(true)
+      }
+    }
   }
 
   /* Returns the html for the project results page. */
@@ -826,9 +949,45 @@ function ProjectResults() {
       </table>
       <button onClick={() => editProjectPage(teacherId, projectId)}>Edit Project Details</button>
       <button onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
-      <button>Create Me a Graph</button>
-      <button onClick={downloadSVG}>Download Data</button>
+      <button onClick={buildCharts}>Create Some Graphs</button>
+      <button onClick={downloadCSV}>Download Data</button>
     </div>
+    
+    {graphFields.map((graph) => (
+      graph.chart_type == 'line' ? (
+        <div id='graph-box'>
+          <canvas id={graph.chart_type}></canvas>
+        </div>
+      ) : graph.chart_type == 'bar' && showNumericCard ? (
+        <div>
+          <div className="num-cell span2">
+            <div className="num-cell-val">{graph.stats.mean}</div>
+            <div className="num-cell-lbl">Average</div>
+          </div>
+          <div className="num-cell">
+            <div className="num-cell-val">{graph.stats.min}</div>
+            <div className="num-cell-lbl">Min</div>
+          </div>
+          <div className="num-cell">
+            <div className="num-cell-val">{graph.stats.max}</div>
+            <div className="num-cell-lbl">Max</div>
+          </div>
+          
+        </div>
+      ) : graph.chart_type == 'pie' ? (
+        <div id='graph-box'>
+          <canvas id={graph.chart_type}></canvas>
+        </div>
+      ) : graph.chart_type == 'none' && showNumericCard ? (
+        <div>
+          <div className="num-cell">
+            <div className="num-cell-val">{graph.stats.count}</div>
+            <div className="num-cell-lbl">Count</div>
+          </div>
+        </div>
+      ) : (
+        <div></div>
+      )))}
     </>
   )
 }
