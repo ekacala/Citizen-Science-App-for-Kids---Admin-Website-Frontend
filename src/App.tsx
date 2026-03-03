@@ -888,27 +888,29 @@ function ProjectResults() {
   // Process data to build charts
   const buildCharts = () => {
     console.log(graphFields)
-    let lineGraphData = []
-    let lineGraphLabels = []
-    let pieGraphData = []
-    let pieGraphLabels = []
+    let graphData = []
+    let graphLabels = []
     
     for (const f in graphFields) {
       if (graphFields[f].chart_type == 'line') {
         for (const t in graphFields[f].stats.timeline) {
-          lineGraphLabels.push(graphFields[f].stats.timeline[t].date)
-          lineGraphData.push(graphFields[f].stats.timeline[t].count)
+          graphLabels.push(graphFields[f].stats.timeline[t].date)
+          graphData.push(graphFields[f].stats.timeline[t].count)
         }
-        buildLineGraph(lineGraphLabels, lineGraphData, graphFields[f].field_id.toString())
+        buildLineGraph(graphLabels, graphData, graphFields[f].field_id.toString())
+        graphData = []
+        graphLabels = []
         
       } else if (graphFields[f].chart_type == 'number') {
         setShowNumericCard(true)
       } else if (graphFields[f].chart_type == 'pie') {
         for (const t in graphFields[f].stats.frequency) {
-          pieGraphLabels.push(graphFields[f].stats.frequency[t].value)
-          pieGraphData.push(graphFields[f].stats.frequency[t].count)
+          graphLabels.push(graphFields[f].stats.frequency[t].value)
+          graphData.push(graphFields[f].stats.frequency[t].count)
         }
-        buildPieGraph(pieGraphLabels, pieGraphData, graphFields[f].field_id.toString())
+        buildPieGraph(graphLabels, graphData, graphFields[f].field_id.toString())
+        graphData = []
+        graphLabels = []
       } 
     }
   }
