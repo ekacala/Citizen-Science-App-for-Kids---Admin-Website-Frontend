@@ -138,6 +138,10 @@ th, td {
   display: inline-block;
 }
 
+.flex {
+  display: flex;
+}
+
 #project-list-table {
   width: 100%;
   background-color: #eee;
@@ -306,9 +310,66 @@ input {
   margin: 0 auto;
 }
 
-/*----- Project Results -----*/
-#project-results-table {
+/*----- Project Results -----
+#project-details-title {
+  text-align: left;
+  margin-top: 0;
+}*/
+
+#project-details-back-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+}
+
+#project-details-back-button:hover {
+  cursor: pointer;
+}
+
+#project-details {
+  width: 70%;
+  background-color: #eee;
+  border: solid 1px #6179793f;
+  padding: 15px 20px;
+  margin: 20px auto;
+  border-radius: 10px;
+  text-align: left;
+}
+
+#project-details-title-button {
   margin: 0 auto;
+  border: none;
+  display: inline-flex;
+  width: 190px;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -5%);
+}
+
+#project-details-title-button h2 {
+  margin: 10px 5px;
+}
+
+#project-details-title-button:hover {
+  cursor: pointer;
+}
+
+#project-edit-icon {
+  width: 20px;
+}
+
+#project-results-table {
+  max-width: 80%;
+  margin: 0 auto;
+  background-color: #eee;
+  overflow-x: auto;
+}
+
+#project-results-table, td {
+  padding: 5px 10px;
 }
 
 #graph-prompt-box {
@@ -322,7 +383,63 @@ input {
   transform: translate(-50%, -50%);
 }
 
-#graph-box {
+#graph-box-title {
   width: 100%;
-  height: 600px;
 }
+
+#graph-box-exit-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  border: none;
+}
+
+#graph-box-exit-button:hover {
+  cursor: pointer;
+}
+
+#graph-box {
+  margin: 0 auto;
+  padding: 50px;
+  background-color: #eee;
+  border: 2px solid #000;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: 70vw;
+  height: 500px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow-y: auto;
+}
+
+.line-graph-box, 
+.pie-graph-box {
+  max-width: 80%;
+  max-height: 400px;
+  margin: 20px;
+  background-color: #b4cdcd3f;
+  border: solid 1px #6179793f;
+  border-radius: 10px;
+}
+
+
+canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.graph-cell {
+  margin: 10px;
+}
+
+.number-graph-box {
+  width: 292px;
+  background-color: #b4cdcd3f;
+  border: solid 1px #6179793f;
+  border-radius: 10px;
+}
+
+

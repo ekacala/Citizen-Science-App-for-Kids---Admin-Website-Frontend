@@ -5,10 +5,11 @@ import { Line, LineChart, ResponsiveContainer } from 'recharts'
 import { Chart, registerables, type ChartConfiguration } from 'chart.js'
 import './App.css' 
 import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage, editProjectPage } from './components/navigation'
-import { dropdownMenu, graphMenu } from './components/menu'
+import { dropdownMenu, graphBox } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
 import googleIcon from './assets/google-logo.svg'
+import editIcon from './assets/edit-icon.svg'
 
 Chart.register(...registerables)
 
@@ -840,8 +841,13 @@ function ProjectResults() {
 
   // Generate line graph
   const buildLineGraph = (lineGraphLabels: any, lineGraphData: any, lineGraphId: string) => {
+    let myChart!: Chart | null
+    if (myChart != null) {
+      myChart.destroy()
+    }
     const ctx = document.getElementById(lineGraphId) as HTMLCanvasElement
-    new Chart(ctx, {
+
+    myChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: lineGraphLabels, datasets: [{
@@ -887,6 +893,7 @@ function ProjectResults() {
   
   // Process data to build charts
   const buildCharts = () => {
+    graphBox()
     console.log(graphFields)
     let graphData = []
     let graphLabels = []
@@ -918,10 +925,10 @@ function ProjectResults() {
   /* Returns the html for the project results page. */
   return (
     <>
-    <h1>{projectTitle}</h1>
-    <button onClick={() => projectPage(teacherId)}>Back</button>
+    <h1 id='project-details-title'>{projectTitle}</h1>
+    <button id='project-details-back-button' onClick={() => projectPage(teacherId)}>Back</button>
     <div id='project-details'>
-      <h2>Project Details</h2>
+      <button id='project-details-title-button' onClick={() => editProjectPage(teacherId, projectId)}><h2>Project Details</h2><img id='project-edit-icon' src={editIcon}></img></button>
       <p>Access Code: {projectCode}</p>
       <p>Description: {projectDescription}</p>
       <p>Instructions: {projectInstructions}</p>
@@ -948,40 +955,48 @@ function ProjectResults() {
           ))}
         </tbody>
       </table>
-      <button onClick={() => editProjectPage(teacherId, projectId)}>Edit Project Details</button>
       <button onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
       <button onClick={buildCharts}>Create Some Graphs</button>
       <button onClick={downloadCSV}>Download Data</button>
     </div>
-    
-    {graphFields.map((graph) => (
-      graph.chart_type == 'line' ? (
-        <div key={graph.field_id} id='graph-box'>
-          <canvas id={graph.field_id.toString()}></canvas>
-        </div>
-      ) : graph.chart_type == 'number' && showNumericCard ? (
-        <div key={graph.field_id}>
-          <div className="num-cell span2">
-            <div className="num-cell-val">{graph.stats.mean}</div>
-            <div className="num-cell-lbl">Average</div>
+    <div id='graph-box' className='hide'>
+      <h2 id='graph-box-title'>Graphs</h2>
+      <button id='graph-box-exit-button' onClick={buildCharts}>X</button>
+      {graphFields.map((graph) => (
+        graph.chart_type == 'line' ? (
+          <div key={graph.field_id} className='line-graph-box'>
+            <h3>{graph.field_name}</h3>
+            <p>Field Type: {graph.field_type}</p>
+            <div className='graph-cell'>
+              <canvas id={graph.field_id.toString()}></canvas>
+            </div>
           </div>
-          <div className="num-cell">
-            <div className="num-cell-val">{graph.stats.min}</div>
-            <div className="num-cell-lbl">Min</div>
+        ) : graph.chart_type == 'number' && showNumericCard ? (
+          <div key={graph.field_id} className='number-graph-box'>
+            <h3>{graph.field_name}</h3>
+            <p>Field Type: {graph.field_type}</p>
+            <div className="num-cell span2">
+              <p className="num-cell-lbl">Average: {graph.stats.mean}</p>
+            </div>
+            <div className="num-cell">
+              <p className="num-cell-lbl">Min: {graph.stats.min}</p>
+            </div>
+            <div className="num-cell">
+              <p className="num-cell-lbl">Max: {graph.stats.max}</p>
+            </div>
           </div>
-          <div className="num-cell">
-            <div className="num-cell-val">{graph.stats.max}</div>
-            <div className="num-cell-lbl">Max</div>
+        ) : graph.chart_type == 'pie' ? (
+          <div key={graph.field_id} className='pie-graph-box'>
+            <h3>{graph.field_name}</h3>
+            <p>Field Type: {graph.field_type}</p>
+            <div className='graph-cell'>
+              <canvas id={graph.field_id.toString()}></canvas>
+            </div>
           </div>
-          
-        </div>
-      ) : graph.chart_type == 'pie' ? (
-        <div key={graph.field_id} id='graph-box'>
-          <canvas id={graph.field_id.toString()}></canvas>
-        </div>
-      ) : (
-        <div key={graph.field_id}></div>
-      )))}
+        ) : (
+          <div key={graph.field_id}></div>
+        )))}
+      </div>
     </>
   )
 }

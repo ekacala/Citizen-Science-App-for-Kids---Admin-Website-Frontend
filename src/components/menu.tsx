@@ -3,9 +3,9 @@ function dropdownMenu() {
     menu!.classList.toggle('show'); 
 }
 
-function graphMenu() {
-    const menu = document.getElementById('graph-prompt-box')
-    menu!.classList.toggle('show'); 
+function graphBox() {
+    const menu = document.getElementById('graph-box')
+    menu!.classList.toggle('flex'); 
 }
 
-export {dropdownMenu, graphMenu}
+export {dropdownMenu, graphBox}
