@@ -361,7 +361,7 @@ function NewProject() {
     {!projectCreated ? (
     <div id='create-project'>
       <button id='exit-create-project-button' onClick={() => projectPage(teacherId)}>X</button>
-      <form onSubmit={createNewProject} id='create-project-form'>
+      <form onSubmit={createNewProject} id='create-project-form' className='project-data-form'>
         <label htmlFor='title'>Title: </label>
         <input type='text' id='title' name='title' onChange={(event) => setProjectTitle(event.target.value)}></input><br/>
         <label htmlFor='description'>Description: </label>
@@ -665,8 +665,8 @@ function EditProject() {
     <>
     <h1>Edit {projectTitle}</h1>
     <div id='add-data'>
-      <form onSubmit={handleSubmit(onSubmit)} id='add-data-form'>
-        <label htmlFor='project_title'>title: </label>
+      <form onSubmit={handleSubmit(onSubmit)} id='edit-data-form' className='project-data-form'>
+        <label htmlFor='project_title'>Title: </label>
         <input type='text' id='project_title' defaultValue={projectTitle} {...register('project_title')} ></input><br/>
 
         <label htmlFor='project_description'>Description: </label>
@@ -675,10 +675,12 @@ function EditProject() {
         <label htmlFor='project_instructions'>Instructions: </label>
         <textarea id='project_instructions' defaultValue={projectInstructions} {...register('project_instructions')}></textarea><br/>
 
-        <input type='submit' value={'Edit Project'} id='field-submit' name='field_submit'></input>
+        <div>
+          <input type='submit' value={'Edit Project'} id='edit-project-submit' className='button' name='field_submit'></input>
+          
+        </div>
       </form>
-      <button onClick={() => projectDetailsPage(teacherId, projectId)}>Cancel</button>
-      
+      <button id='cancel-edit-project-button' className='button' onClick={() => projectDetailsPage(teacherId, projectId)}>Cancel</button>
     </div>
     </>
   )

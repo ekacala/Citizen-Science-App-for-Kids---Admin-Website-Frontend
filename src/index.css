@@ -236,7 +236,7 @@ th, td {
 }
 
 /*----- Create New Project -----*/
-#create-project-form {
+.project-data-form {
   border: solid 1px black;
   background-color: #eeeeeec1;
   max-width: 500px;
@@ -383,11 +383,7 @@ input {
   fill: #3AE070;
 }
 
-/*----- Project Results -----
-#project-details-title {
-  text-align: left;
-  margin-top: 0;
-}*/
+/*----- Project Results -----*/
 
 #project-details-back-button {
   position: absolute;
@@ -515,4 +511,30 @@ canvas {
   border-radius: 10px;
 }
 
+/*----- Edit Project Details -----*/
+#edit-data-form {
+  min-height: 550px;
+}
 
+#project_title {
+  width: 400px;
+  margin: 0 auto;
+}
+
+#project_description,
+#project_instructions {
+  height: 150px;
+  width: 400px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#edit-project-submit {
+  margin-right: 110px;
+}
+
+#cancel-edit-project-button {
+  position: relative;
+  bottom: 64px;
+  left: 70px;
+}
