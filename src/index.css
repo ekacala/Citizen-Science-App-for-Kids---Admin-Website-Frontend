@@ -38,6 +38,18 @@ th, td {
   border: 1px solid black;
 }
 
+.button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  background-color: #E05B3A;
+}
+
 /*------ Login Page -----*/
 
 #home-page {
@@ -226,6 +238,7 @@ th, td {
 /*----- Create New Project -----*/
 #create-project-form {
   border: solid 1px black;
+  background-color: #eeeeeec1;
   max-width: 500px;
   height: 500px;
   margin: 0 auto;
@@ -241,8 +254,13 @@ th, td {
   top: 40px;
   border: none;
   padding: 0.4em 1em;
-  font-size: 1em;
+  font-size: 1.20em;
   font-weight: 500;
+}
+
+#exit-create-project-button:hover {
+  cursor: pointer;
+  color: #E05B3A;
 }
 
 input {
@@ -263,17 +281,27 @@ input {
   margin: 0 auto;
 }
 
-#submit {
-  width: 100px;
+#submit-new-project {
+  width: 200px;
   margin: 0 auto 20px auto;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  background-color: #E05B3A;
 }
 
 #add-data-form {
   border: solid 1px black;
+  background-color: #eeeeeec1;
   max-width: 500px;
   min-height: 450px;
   margin: 0 auto;
-  padding-top: 20px;
+  padding: 20px 0px;
   display: flex;
   flex-direction: column;
 }
@@ -288,26 +316,71 @@ input {
   list-style-type: none;
 }
 
-.delete-field-option-button {
-  margin-left: 10px;
+#field-options-list li {
+  height: 22px;
+  margin-bottom: 7px;
 }
 
-#add-data-form #submit {
-  width: 110px;
+.delete-field-option-button {
+  margin-left: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  top: 9px;
+}
+
+.delete-field-option-button img {
+  width: 30px;
+  
+}
+
+#field-form-buttons {
+  display: inline-flex;
+  justify-content: center;
 }
 
 #field-submit {
-  width: 50px;
+  width: 100px !important;
+  margin: 0px 10px !important;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 10px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  background-color: #E05B3A;
+  
 }
 
 #exit-create-data-button {
-  width: 200px;
-  margin: 10px auto 0px auto;
+  width: 100px;
+  margin: 0px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 10px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  background-color: #E05B3A;
 }
 
 #add-field-option-button {
-  width: 110px;
+  width: 60px;
   margin: 0 auto;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+#add-field-option-button img {
+  width: 40px;
+  margin: 0 auto;
+  fill: #3AE070;
 }
 
 /*----- Project Results -----

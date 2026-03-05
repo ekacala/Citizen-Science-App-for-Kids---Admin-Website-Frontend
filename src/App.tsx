@@ -10,6 +10,8 @@ import { dropdownMenu, graphBox } from './components/menu'
 import menuButton from './assets/menu-icon.svg'
 import googleIcon from './assets/google-logo.svg'
 import editIcon from './assets/edit-icon.svg'
+import plusIcon from './assets/plus-icon.svg'
+import deleteIcon from './assets/delete-icon.svg'
 
 Chart.register(...registerables)
 
@@ -366,7 +368,7 @@ function NewProject() {
         <textarea id='description' name='description' onChange={(event) => setProjectDescription(event.target.value)}></textarea><br/>
         <label htmlFor='instructions'>Instructions: </label>
         <textarea id='instructions' name='instructions' onChange={(event) => setProjectInstructions(event.target.value)}></textarea><br/>
-        <input type='submit' value={'Create Project'} id='submit' name='submit'></input>
+        <input type='submit' value={'Create Project'} id='submit-new-project' name='submit'></input>
       </form>
     </div>
     ) : (
@@ -396,13 +398,13 @@ function NewProject() {
           {fields.map((field, index) => (
             <li key={field.id}>
               <input type='text' id='field_options' defaultValue={''} {...register(`field_options.${index}.option`)} disabled = {isOptionsDisabled}></input>
-              <button type='button' className='delete-field-option-button' onClick={() => remove(index)}>Delete</button>
+              <button type='button' className='delete-field-option-button' onClick={() => remove(index)}><img src={deleteIcon}></img></button>
             </li>
           ))}
         </ul>
           {/*<input type='text' id='field_options' defaultValue={''} {...register('field_options')} disabled = {isOptionsDisabled}></input><br/>*/}
 
-        <button id='add-field-option-button' type='button' onClick={() => append({option: ''})}>Add Option</button>
+        <button id='add-field-option-button' type='button' onClick={() => append({option: ''})}><img src={plusIcon}></img></button>
 
         <label htmlFor='field_required'>Is this data point required? </label>
         <select id='field_required' defaultValue={''} {...register('field_required', { setValueAs: parseBoolean })}>
@@ -410,10 +412,10 @@ function NewProject() {
           <option value={'true'}>Yes</option>
           
         </select><br/>
-
-        <input type='submit' value={'Add Data Point'} id='field-submit' name='field_submit'></input>
-
-        <button id='exit-create-data-button' onClick={() => projectPage(teacherId)}>I'm Done Adding Data Points</button>
+        <div id='field-form-buttons'>
+          <input type='submit' value={'Create'} id='field-submit'  name='field_submit'></input>
+          <button id='exit-create-data-button' onClick={() => projectPage(teacherId)}>Finish</button>
+        </div>
       </form>
       
     </div>
