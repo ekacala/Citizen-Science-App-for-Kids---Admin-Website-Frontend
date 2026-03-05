@@ -1,10 +1,10 @@
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent, type FormEventHandler } from 'react'
 import { useForm, useWatch, useFieldArray } from 'react-hook-form'
 import { RechartsDevtools } from '@recharts/devtools'
 import { Line, LineChart, ResponsiveContainer } from 'recharts'
 import { Chart, registerables, type ChartConfiguration } from 'chart.js'
 import './App.css' 
-import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage, editProjectPage } from './components/navigation'
+import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage, editProjectPage, editFieldPage } from './components/navigation'
 import { dropdownMenu, graphBox } from './components/menu'
 
 import menuButton from './assets/menu-icon.svg'
@@ -687,6 +687,155 @@ function EditProject() {
   )
 }
 
+function EditField() {
+  // Get teacherId and projectId
+  const idNums = window.location.pathname.slice(12)
+  const idList = idNums.split('/')
+  const teacherId = idList[0]
+  const projectId = idList[1]
+  const fieldId = idList[2]
+  console.log(fieldId)
+
+  // Store project details
+  const [fieldName, setFieldName] = useState('')
+  const [fieldLabel, setFieldLabel] = useState('')
+  const [fieldRequired, setFieldRequired] =useState('')
+
+  const [loaded, setLoaded] = useState(false)
+
+  // Define FormData types for fields form
+  type FormData = {
+    field_name: string
+    field_label: string
+    field_required: string
+  }
+
+  // Get field and set field values
+  useEffect(() => {
+    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields/${fieldId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const fieldArray = json.data
+        console.log(fieldArray)
+        setFieldName(fieldArray.field_name)
+        setFieldLabel(fieldArray.field_label)
+        setLoaded(true)
+      })
+  }, [loaded, fieldId]);
+
+  // Remove any blank values
+  const cleanData = (data: object) => {
+    return Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== '')
+    )
+  }
+
+  const {
+    register,
+    handleSubmit,
+  } = useForm<FormData>({
+  })
+
+  // Submit form to edit details for a project
+  const onSubmit = async (data: FormData) => {
+    const cleanedData = cleanData(data)
+    // Check if no values have been changed
+    if (Object.keys(cleanedData).length == 0) {
+      alert('Please edit at least one value')
+      return
+    }
+    console.log(cleanedData)
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields/${fieldId}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cleanedData)
+      
+    })
+    .then(() => (
+      projectDetailsPage(teacherId, projectId)
+    ))
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
+  }
+
+  // Confirm field delete
+  function deleteConfirmation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const confirmation = document.getElementById('confirmation-box')
+    confirmation!.classList.toggle('show')
+  }
+
+  // Delete field
+  const deleteProject = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    console.log('click')
+
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields/${fieldId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    .then((res) => res.json())
+      .then((json) => {
+        console.log(json)
+        projectDetailsPage(teacherId, projectId)
+      })  
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
+  }
+
+  return (
+    <>
+    <h1>Edit {fieldName}</h1>
+    <div id='add-data'>
+      <form onSubmit={handleSubmit(onSubmit)} id='edit-data-form' className='project-data-form'>
+        <label htmlFor='field_name'>Name: </label>
+        <input type='text' id='field_name' defaultValue={fieldName} {...register('field_name')} ></input><br/>
+
+        <label htmlFor='field_label'>Description: </label>
+        <input type='text' id='field_label' defaultValue={fieldLabel} {...register('field_label')}></input><br/>
+
+        <div>
+          <input type='submit' value={'Edit Field'} id='edit-field-submit' className='button' name='field_submit'></input>
+          
+        </div>
+      </form>
+      <button id='cancel-edit-field-button' className='button' onClick={() => projectDetailsPage(teacherId, projectId)}>Cancel</button>
+      <form onSubmit={(event) => deleteConfirmation(event)}>
+        <button type='submit' id='delete-project-button'>Delete</button>
+      </form>
+    </div>
+    <div id='confirmation-box' className='hide'>
+      <h2>Are you sure you want to delete this project?</h2>
+      <p>All information for this project including student observations will be deleted if you do.</p>
+      <div id='confirmation-box-button-box'>
+        <form onSubmit={(event) => deleteProject(event)}>
+          <button className='confirmation-box-button'>Yes</button>
+        </form>
+        <form onSubmit={(event) => deleteConfirmation(event)}>
+          <button className='confirmation-box-button'>No</button>
+        </form>
+      </div>
+    </div>
+    </>
+  )
+}
+
 
 function ProjectResults() {
   // Get teacherId and projectId
@@ -979,7 +1128,9 @@ function ProjectResults() {
           <tr>
             {/*<td>Student</td>*/}
             {projectFields.map((field) => (
-            <td key={field.field_id}>{field.field_name}</td>
+            <td key={field.field_id}>
+              <a onClick={() => editFieldPage(teacherId, projectId, field.field_id)} id='project-field-link'>{field.field_name}</a>
+            </td>
             ))}
             <td></td>
           </tr>
@@ -1058,4 +1209,4 @@ function ProjectResults() {
   )
 }
 
-export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields, EditProject};
+export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields, EditProject, EditField};
