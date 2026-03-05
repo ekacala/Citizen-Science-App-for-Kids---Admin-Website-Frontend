@@ -538,3 +538,29 @@ canvas {
   bottom: 64px;
   left: 70px;
 }
+
+/*----- Edit Project Details -----*/
+#edit-field-form {
+  height: 210px;
+}
+
+#field_name,
+#field_label {
+  width: 400px;
+  margin: 0 auto;
+}
+
+#edit-field-submit {
+  margin-right: 250px;
+}
+
+#cancel-edit-field-button {
+  position: relative;
+  bottom: 63px;
+  left: 115px;
+}
+
+#delete-field-button {
+  position: relative;
+  bottom: 105px;
+}

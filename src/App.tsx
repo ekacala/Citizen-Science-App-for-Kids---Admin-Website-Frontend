@@ -803,11 +803,11 @@ function EditField() {
     <>
     <h1>Edit {fieldName}</h1>
     <div id='add-data'>
-      <form onSubmit={handleSubmit(onSubmit)} id='edit-data-form' className='project-data-form'>
+      <form onSubmit={handleSubmit(onSubmit)} id='edit-field-form' className='project-data-form'>
         <label htmlFor='field_name'>Name: </label>
         <input type='text' id='field_name' defaultValue={fieldName} {...register('field_name')} ></input><br/>
 
-        <label htmlFor='field_label'>Description: </label>
+        <label htmlFor='field_label'>Label: </label>
         <input type='text' id='field_label' defaultValue={fieldLabel} {...register('field_label')}></input><br/>
 
         <div>
@@ -817,12 +817,13 @@ function EditField() {
       </form>
       <button id='cancel-edit-field-button' className='button' onClick={() => projectDetailsPage(teacherId, projectId)}>Cancel</button>
       <form onSubmit={(event) => deleteConfirmation(event)}>
-        <button type='submit' id='delete-project-button'>Delete</button>
+        <button type='submit' id='delete-field-button' className='button'>Delete Field</button>
       </form>
     </div>
+
     <div id='confirmation-box' className='hide'>
-      <h2>Are you sure you want to delete this project?</h2>
-      <p>All information for this project including student observations will be deleted if you do.</p>
+      <h2>Are you sure you want to delete this field?</h2>
+      <p>All information for this field including student observations will be deleted if you do.</p>
       <div id='confirmation-box-button-box'>
         <form onSubmit={(event) => deleteProject(event)}>
           <button className='confirmation-box-button'>Yes</button>
