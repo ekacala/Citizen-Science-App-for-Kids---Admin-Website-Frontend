@@ -111,7 +111,7 @@ function ProjectList() {
     setProjectId(project_id)
     const confirmation = document.getElementById('confirmation-box')
     confirmation!.classList.toggle('show')
-}
+  }
 
   const deleteProject = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -711,7 +711,7 @@ function ProjectResults() {
 
   // Setup data needed to display project observations from array
   interface observation {
-    observaton_id: string
+    observation_id: string
     student_name: string
     field_data: [{
       data_id: string
@@ -746,6 +746,9 @@ function ProjectResults() {
 
   const [graphFields, setGraphFields] = useState<graph[]>([])
   const [showNumericCard, setShowNumericCard] = useState(false)
+
+  // Set observation id to be deleted
+  const [observationId, setObservationId] = useState('')
 
   // Get details of project
   useEffect(() => {
@@ -927,6 +930,37 @@ function ProjectResults() {
     }
   }
 
+  function deleteConfirmation(event: FormEvent<HTMLFormElement>, observation_id: string) {
+    event.preventDefault()
+    setObservationId(observation_id)
+    const confirmation = document.getElementById('confirmation-box')
+    confirmation!.classList.toggle('show')
+  }
+
+  const deleteObservation = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    console.log('click')
+
+    try {
+      // Send POST request
+      fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/observations/${observationId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    .then((res) => res.json())
+      .then((json) => {
+        console.log(json)
+        const updatedObservations = projectObservations.filter(projectObservations => projectObservations.observation_id !== observationId)
+        setProjectObservations(updatedObservations)
+        })  
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form.');
+      console.log('error block')
+    }
+    deleteConfirmation(event, '')
+  }
+
   /* Returns the html for the project results page. */
   return (
     <>
@@ -947,15 +981,21 @@ function ProjectResults() {
             {projectFields.map((field) => (
             <td key={field.field_id}>{field.field_name}</td>
             ))}
+            <td></td>
           </tr>
         </thead>
         <tbody>
            {projectObservations.map((observation) => (
-          <tr key={observation.observaton_id}>
+          <tr key={observation.observation_id}>
             {/*<td>{observation.student_name}</td>*/}
            {observation.field_data.map((obv) => (
               <td key={obv.data_id}>{obv.field_value}</td>
             ))}
+            <td>
+              <form onSubmit={(event) => deleteConfirmation(event, observation.observation_id)}>
+                <button type='submit' id='delete-project-button'>Delete</button>
+              </form>
+            </td>
           </tr>
           ))}
         </tbody>
@@ -1001,6 +1041,18 @@ function ProjectResults() {
         ) : (
           <div key={graph.field_id}></div>
         )))}
+      </div>
+      <div id='confirmation-box' className='hide'>
+        <h2>Are you sure you want to delete this observation?</h2>
+        <p>All data included in the observation will be deleted if you do.</p>
+        <div id='confirmation-box-button-box'>
+          <form onSubmit={(event) => deleteObservation(event)}>
+            <button className='confirmation-box-button'>Yes</button>
+          </form>
+          <form onSubmit={(event) => deleteConfirmation(event, '')}>
+            <button className='confirmation-box-button'>No</button>
+          </form>
+        </div>
       </div>
     </>
   )
