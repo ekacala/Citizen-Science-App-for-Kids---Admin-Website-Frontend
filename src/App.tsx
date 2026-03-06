@@ -1,7 +1,5 @@
-import { useState, useEffect, type FormEvent, type FormEventHandler } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { useForm, useWatch, useFieldArray } from 'react-hook-form'
-import { RechartsDevtools } from '@recharts/devtools'
-import { Line, LineChart, ResponsiveContainer } from 'recharts'
 import { Chart, registerables, type ChartConfiguration } from 'chart.js'
 import './App.css' 
 import { addProject, logoutAccount, projectDetailsPage, projectPage, newFieldsPage, editProjectPage, editFieldPage } from './components/navigation'
@@ -179,16 +177,16 @@ function ProjectList() {
       </table>
     </div>
     )}
-    <button onClick={() => addProject(teacher_id)} id='new-project-button'>Create A New Project</button>
+    <button onClick={() => addProject(teacher_id)} id='new-project-button' className='button'>Create A New Project</button>
     <div id='confirmation-box' className='hide'>
       <h2>Are you sure you want to delete this project?</h2>
       <p>All information for this project including student observations will be deleted if you do.</p>
       <div id='confirmation-box-button-box'>
         <form onSubmit={(event) => deleteProject(event)}>
-          <button className='confirmation-box-button'>Yes</button>
+          <button className='confirmation-box-button button'>Yes</button>
         </form>
         <form onSubmit={(event) => deleteConfirmation(event, '')}>
-          <button className='confirmation-box-button'>No</button>
+          <button className='confirmation-box-button button'>No</button>
         </form>
       </div>
     </div>
@@ -368,7 +366,7 @@ function NewProject() {
         <textarea id='description' name='description' onChange={(event) => setProjectDescription(event.target.value)}></textarea><br/>
         <label htmlFor='instructions'>Instructions: </label>
         <textarea id='instructions' name='instructions' onChange={(event) => setProjectInstructions(event.target.value)}></textarea><br/>
-        <input type='submit' value={'Create Project'} id='submit-new-project' name='submit'></input>
+        <input type='submit' value={'Create Project'} id='submit-new-project' className='button' name='submit'></input>
       </form>
     </div>
     ) : (
@@ -413,8 +411,8 @@ function NewProject() {
           
         </select><br/>
         <div id='field-form-buttons'>
-          <input type='submit' value={'Create'} id='field-submit'  name='field_submit'></input>
-          <button id='exit-create-data-button' onClick={() => projectPage(teacherId)}>Finish</button>
+          <input type='submit' value={'Create'} id='field-submit' className='button'  name='field_submit'></input>
+          <button id='exit-create-data-button' className='button' onClick={() => projectPage(teacherId)}>Finish</button>
         </div>
       </form>
       
@@ -570,8 +568,8 @@ function NewFields() {
         </select><br/>
 
         <div>
-          <input type='submit' value={'Create'} id='field-submit' name='field_submit'></input>
-          <button id='exit-create-data-button' onClick={() => projectDetailsPage(teacherId, projectId)}>Finish</button>
+          <input type='submit' value={'Create'} id='field-submit' className='button' name='field_submit'></input>
+          <button id='exit-create-data-button' className='button' onClick={() => projectDetailsPage(teacherId, projectId)}>Finish</button>
         </div>
       </form>
       
@@ -699,7 +697,6 @@ function EditField() {
   // Store project details
   const [fieldName, setFieldName] = useState('')
   const [fieldLabel, setFieldLabel] = useState('')
-  const [fieldRequired, setFieldRequired] =useState('')
 
   const [loaded, setLoaded] = useState(false)
 
@@ -837,7 +834,6 @@ function EditField() {
   )
 }
 
-
 function ProjectResults() {
   // Get teacherId and projectId
   const idNums = window.location.pathname.slice(17)
@@ -854,7 +850,7 @@ function ProjectResults() {
 
   // Setup data needed to display project fields from array
   interface field {
-    field_id: string
+    field_id: number
     field_name: string
   }
   const [projectFields, setProjectFields] = useState<field[]>([])
@@ -865,11 +861,13 @@ function ProjectResults() {
     student_name: string
     field_data: [{
       data_id: string
+      field_id: number
       field_name: string
       field_value: string
     }]
   }
   const [projectObservations, setProjectObservations] = useState<observation[]>([])
+  const [modifiedObservations, setModifiedObservations] = useState<observation[]>([])
 
   // Setup data needed to generate a graph
   interface graph {
@@ -900,52 +898,86 @@ function ProjectResults() {
   // Set observation id to be deleted
   const [observationId, setObservationId] = useState('')
 
-  // Get details of project
   useEffect(() => {
-    // Get project
-    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}`, {
-      method: 'GET',
-      credentials: 'include'
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        const projectArray = json.data
-        setProjectTitle(projectArray.project_title)
-        setProjectCode(projectArray.project_code)
-        setProjectDescription(projectArray.project_description)
-        setProjectInstructions(projectArray.project_instructions)
-      })
-    // Get fields
-    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
-      method: 'GET',
-      credentials: 'include'
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        const fieldsArray = json.data 
-        setProjectFields(fieldsArray)
-      })
-    // Get observations
-    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/observations?format=string`, {
-      method: 'GET',
-      credentials: 'include'
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        const observationsArray = json.data
-        setProjectObservations(observationsArray)
-      })
-    // Get graph info
-    fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/stats`, {
-      method: 'GET',
-      credentials: 'include'
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        const data = json.data 
-        setGraphFields(data.fields)
+    const fetchData = async () => {
+      try {
+        const responseProject = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}`, {
+          method: 'GET',
+          credentials: 'include'
+        })
+        if (!responseProject.ok) throw new Error('failed to fetch project')
+        const projectData = await responseProject.json()
+
+        const responseFields = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields`, {
+          method: 'GET',
+          credentials: 'include'
+        })
+        if (!responseFields.ok) throw new Error('failed to fetch fields')
+        const fieldsData = await responseFields.json()
+
+        const responseObservations = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/observations?format=string`, {
+          method: 'GET',
+          credentials: 'include'
+        })
+        if (!responseObservations.ok) throw new Error('failed to fetch observations')
+        const observationData = await responseObservations.json()
+
+        const responseGraphs = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/stats`, {
+          method: 'GET',
+          credentials: 'include'
+        })
+        if (!responseGraphs.ok) throw new Error('failed to fetch graphs')
+        const graphData = await responseGraphs.json()
+
+        setProjectTitle(projectData.data.project_title)
+        setProjectCode(projectData.data.project_code)
+        setProjectDescription(projectData.data.project_description)
+        setProjectInstructions(projectData.data.project_instructions)
+
+        setProjectFields(fieldsData.data)
+        setProjectObservations(observationData.data)
+        setGraphFields(graphData.data.fields)
+
         setLoaded(true)
-      })
+      }
+      catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Failed to submit form.');
+        console.log('error block')
+      }
+    }
+    fetchData()
+    //console.log(observationData.data)
+    const processObservations = () => {
+      let tempObject 
+      let fieldsContained: number[] = []
+      tempObject = projectObservations
+      for (const f in projectFields) {
+        //fieldList.push(projectFields[f].field_id)
+        for (const o in projectObservations) {
+          for (const d in projectObservations[o].field_data) {
+            //console.log(projectObservations[o].field_data[d])
+            fieldsContained.push(projectObservations[o].field_data[d].field_id)
+            //const isIncluded = Object.values(projectObservations[o].field_data).includes(projectFields[f].field_id)
+          }
+          //console.log(fieldsContained)
+          
+          if (!fieldsContained.includes(projectFields[f].field_id)) {
+            //console.log(projectFields[f].field_id)
+            tempObject[o].field_data.push(
+              {data_id: '-1', field_id: projectFields[f].field_id, field_value: 'No Data', field_name: ''}
+            )
+            tempObject[o].field_data.sort((a, b) => a.field_id - b.field_id)
+            //console.log(tempObject)
+          }
+          fieldsContained = []
+        }
+        
+      }
+      setModifiedObservations(tempObject)
+    }
+    processObservations()
+    //console.log(projectObservations)
   }, [loaded, projectId]);
   if (!loaded) {
     return (
@@ -954,7 +986,7 @@ function ProjectResults() {
       </div>
     );
   }
-
+  
   // Create CSV download for user
   const createDownloadLink = (blob: Blob, filename: string) => {
     const url = window.URL.createObjectURL(blob);
@@ -1115,7 +1147,7 @@ function ProjectResults() {
   return (
     <>
     <h1 id='project-details-title'>{projectTitle}</h1>
-    <button id='project-details-back-button' onClick={() => projectPage(teacherId)}>Back</button>
+    <button id='project-details-back-button' onClick={() => projectPage(teacherId)}>Home</button>
     <div id='project-details'>
       <button id='project-details-title-button' onClick={() => editProjectPage(teacherId, projectId)}><h2>Project Details</h2><img id='project-edit-icon' src={editIcon}></img></button>
       <p>Access Code: {projectCode}</p>
@@ -1130,18 +1162,18 @@ function ProjectResults() {
             {/*<td>Student</td>*/}
             {projectFields.map((field) => (
             <td key={field.field_id}>
-              <a onClick={() => editFieldPage(teacherId, projectId, field.field_id)} id='project-field-link'>{field.field_name}</a>
+              <a onClick={() => editFieldPage(teacherId, projectId, field.field_id.toString())} id='project-field-link'>{field.field_name}</a>
             </td>
             ))}
             <td></td>
           </tr>
         </thead>
         <tbody>
-           {projectObservations.map((observation) => (
+           {modifiedObservations.map((observation) => (
           <tr key={observation.observation_id}>
             {/*<td>{observation.student_name}</td>*/}
            {observation.field_data.map((obv) => (
-              <td key={obv.data_id}>{obv.field_value}</td>
+              <td key={obv.data_id} className='observation-cell'>{obv.field_value}</td>
             ))}
             <td>
               <form onSubmit={(event) => deleteConfirmation(event, observation.observation_id)}>
@@ -1152,9 +1184,11 @@ function ProjectResults() {
           ))}
         </tbody>
       </table>
-      <button onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
-      <button onClick={buildCharts}>Create Some Graphs</button>
-      <button onClick={downloadCSV}>Download Data</button>
+      <div id='project-details-button-box'>
+        <button className='button project-details-button' onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
+        <button className='button project-details-button' onClick={buildCharts}>Create Some Graphs</button>
+        <button className='button project-details-button' onClick={downloadCSV}>Download Data</button>
+      </div>
     </div>
     <div id='graph-box' className='hide'>
       <h2 id='graph-box-title'>Graphs</h2>
@@ -1199,10 +1233,10 @@ function ProjectResults() {
         <p>All data included in the observation will be deleted if you do.</p>
         <div id='confirmation-box-button-box'>
           <form onSubmit={(event) => deleteObservation(event)}>
-            <button className='confirmation-box-button'>Yes</button>
+            <button className='confirmation-box-button button'>Yes</button>
           </form>
           <form onSubmit={(event) => deleteConfirmation(event, '')}>
-            <button className='confirmation-box-button'>No</button>
+            <button className='confirmation-box-button button'>No</button>
           </form>
         </div>
       </div>

@@ -50,6 +50,11 @@ th, td {
   background-color: #E05B3A;
 }
 
+.button:hover {
+  background-color: #eee;
+  border: 1px solid #E05B3A;
+}
+
 /*------ Login Page -----*/
 
 #home-page {
@@ -181,15 +186,6 @@ th, td {
 
 #new-project-button {
   margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  background-color: #E05B3A;
 }
 
 #delete-project-button {
@@ -222,17 +218,9 @@ th, td {
 }
 
 .confirmation-box-button {
-  border-radius: 5px;
-  border: 1px solid transparent;
   padding: 0.5em 1em;
   margin: 0 20px;
   width: 75px;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  background-color: #E05B3A;
 }
 
 /*----- Create New Project -----*/
@@ -284,15 +272,6 @@ input {
 #submit-new-project {
   width: 200px;
   margin: 0 auto 20px auto;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  background-color: #E05B3A;
 }
 
 #add-data-form {
@@ -343,30 +322,14 @@ input {
 #field-submit {
   width: 100px !important;
   margin: 0px 10px !important;
-  border-radius: 8px;
-  border: 1px solid transparent;
   padding: 10px;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  background-color: #E05B3A;
   
 }
 
 #exit-create-data-button {
   width: 100px;
   margin: 0px 10px;
-  border-radius: 8px;
-  border: 1px solid transparent;
   padding: 10px;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  background-color: #E05B3A;
 }
 
 #add-field-option-button {
@@ -391,10 +354,13 @@ input {
   right: 20px;
   background: none;
   border: none;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 #project-details-back-button:hover {
   cursor: pointer;
+  color: #E05B3A;
 }
 
 #project-details {
@@ -431,7 +397,7 @@ input {
 }
 
 #project-results-table {
-  max-width: 80%;
+  width: 100%;
   margin: 0 auto;
   background-color: #eee;
   overflow-x: auto;
@@ -439,17 +405,20 @@ input {
 
 #project-results-table, td {
   padding: 5px 10px;
+  max-width: 400px;
+  overflow-y: auto;
 }
 
-#graph-prompt-box {
-  border: 1px solid #000;
-  background-color: #fff;
-  padding: 10px;
-  width: 400px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+#project-field-link:hover {
+  cursor: pointer;
+}
+
+#project-details-button-box {
+  margin: 8px;
+}
+
+.project-details-button {
+  margin: 0px 5px;
 }
 
 #graph-box-title {
