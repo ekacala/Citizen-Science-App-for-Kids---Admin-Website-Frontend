@@ -978,7 +978,7 @@ function ProjectResults() {
     }
     processObservations()
     //console.log(projectObservations)
-  }, [loaded, projectId]);
+  }, [loaded, projectId, projectObservations]);
   if (!loaded) {
     return (
       <div>
@@ -1075,7 +1075,7 @@ function ProjectResults() {
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'right', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } }
+          legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } }
         }
       }
     } as ChartConfiguration);
@@ -1165,7 +1165,7 @@ function ProjectResults() {
               <a onClick={() => editFieldPage(teacherId, projectId, field.field_id.toString())} id='project-field-link'>{field.field_name}</a>
             </td>
             ))}
-            <td></td>
+            <td className='delete-observation-cell'></td>
           </tr>
         </thead>
         <tbody>
@@ -1175,7 +1175,7 @@ function ProjectResults() {
            {observation.field_data.map((obv) => (
               <td key={obv.data_id} className='observation-cell'>{obv.field_value}</td>
             ))}
-            <td>
+            <td className='delete-observation-cell'>
               <form onSubmit={(event) => deleteConfirmation(event, observation.observation_id)}>
                 <button type='submit' id='delete-project-button'>Delete</button>
               </form>
@@ -1195,31 +1195,40 @@ function ProjectResults() {
       <button id='graph-box-exit-button' onClick={buildCharts}>X</button>
       {graphFields.map((graph) => (
         graph.chart_type == 'line' ? (
-          <div key={graph.field_id} className='line-graph-box'>
+          <div key={graph.field_id} className='line-graph-box graph'>
             <h3>{graph.field_name}</h3>
-            <p>Field Type: {graph.field_type}</p>
+            <p className='graph-field-type'>Field Type: {graph.field_type.charAt(0).toUpperCase() + graph.field_type.slice(1)}</p>
             <div className='graph-cell'>
               <canvas id={graph.field_id.toString()}></canvas>
             </div>
           </div>
         ) : graph.chart_type == 'number' && showNumericCard ? (
-          <div key={graph.field_id} className='number-graph-box'>
+          <div key={graph.field_id} className='number-graph-box graph'>
             <h3>{graph.field_name}</h3>
-            <p>Field Type: {graph.field_type}</p>
-            <div className="num-cell span2">
-              <p className="num-cell-lbl">Average: {graph.stats.mean}</p>
+            <p className='graph-field-type'>Field Type: {graph.field_type.charAt(0).toUpperCase() + graph.field_type.slice(1)}</p>
+            <div className="num-cell span2 ">
+              <p className='num-cell-val'>{graph.stats.mean}</p>
+              <p className="num-cell-lbl">Average</p>
             </div>
-            <div className="num-cell">
-              <p className="num-cell-lbl">Min: {graph.stats.min}</p>
-            </div>
-            <div className="num-cell">
-              <p className="num-cell-lbl">Max: {graph.stats.max}</p>
+            <div className='mini-block'>
+              <div className="num-cell">
+                <p className='num-cell-val'>{graph.stats.min}</p>
+                <p className="num-cell-lbl">Min</p>
+              </div>
+              <div className="num-cell">
+                <p className='num-cell-val'>{graph.stats.max}</p>
+                <p className="num-cell-lbl">Max</p>
+              </div>
+              <div className="num-cell">
+                <p className='num-cell-val'>{graph.stats.count}</p>
+                <p className="num-cell-lbl">Responses</p>
+              </div>
             </div>
           </div>
         ) : graph.chart_type == 'pie' ? (
-          <div key={graph.field_id} className='pie-graph-box'>
+          <div key={graph.field_id} className='pie-graph-box graph'>
             <h3>{graph.field_name}</h3>
-            <p>Field Type: {graph.field_type}</p>
+            <p className='graph-field-type'>Field Type: {graph.field_type.charAt(0).toUpperCase() + graph.field_type.slice(1)}</p>
             <div className='graph-cell'>
               <canvas id={graph.field_id.toString()}></canvas>
             </div>
