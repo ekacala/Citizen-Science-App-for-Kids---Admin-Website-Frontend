@@ -1176,7 +1176,7 @@ function ProjectResults() {
               <td key={obv.data_id} className='observation-cell'>{obv.field_value}</td>
             ))}
               {observation.latitude == null || observation.longitude == null ? (
-                <td className='observation-cell'>Not Provided</td>
+                <td className='observation-cell'>No Data</td>
               ) : (
                 <td key={observation.observation_id} className='observation-cell'>{observation.latitude}/{observation.longitude}</td>
               )}
