@@ -859,6 +859,8 @@ function ProjectResults() {
   interface observation {
     observation_id: string
     student_name: string
+    latitude: string
+    longitude: string
     field_data: [{
       data_id: string
       field_id: number
@@ -921,6 +923,7 @@ function ProjectResults() {
         })
         if (!responseObservations.ok) throw new Error('failed to fetch observations')
         const observationData = await responseObservations.json()
+        //console.log(observationData)
 
         const responseGraphs = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/stats`, {
           method: 'GET',
@@ -947,20 +950,15 @@ function ProjectResults() {
       }
     }
     fetchData()
-    //console.log(observationData.data)
     const processObservations = () => {
       let tempObject 
       let fieldsContained: number[] = []
       tempObject = projectObservations
       for (const f in projectFields) {
-        //fieldList.push(projectFields[f].field_id)
         for (const o in projectObservations) {
           for (const d in projectObservations[o].field_data) {
-            //console.log(projectObservations[o].field_data[d])
             fieldsContained.push(projectObservations[o].field_data[d].field_id)
-            //const isIncluded = Object.values(projectObservations[o].field_data).includes(projectFields[f].field_id)
           }
-          //console.log(fieldsContained)
           
           if (!fieldsContained.includes(projectFields[f].field_id)) {
             //console.log(projectFields[f].field_id)
@@ -977,8 +975,8 @@ function ProjectResults() {
       setModifiedObservations(tempObject)
     }
     processObservations()
-    //console.log(projectObservations)
-  }, [loaded, projectId, projectObservations]);
+    console.log(projectObservations)
+  }, [loaded]); //[loaded, projectId, projectObservations]);
   if (!loaded) {
     return (
       <div>
@@ -1134,6 +1132,7 @@ function ProjectResults() {
         console.log(json)
         const updatedObservations = projectObservations.filter(projectObservations => projectObservations.observation_id !== observationId)
         setProjectObservations(updatedObservations)
+        setLoaded(false)
         })  
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -1165,6 +1164,7 @@ function ProjectResults() {
               <a onClick={() => editFieldPage(teacherId, projectId, field.field_id.toString())} id='project-field-link'>{field.field_name}</a>
             </td>
             ))}
+            <td>Latitude/Longitude</td>
             <td className='delete-observation-cell'></td>
           </tr>
         </thead>
@@ -1175,6 +1175,13 @@ function ProjectResults() {
            {observation.field_data.map((obv) => (
               <td key={obv.data_id} className='observation-cell'>{obv.field_value}</td>
             ))}
+              {observation.latitude == null || observation.longitude == null ? (
+                <td className='observation-cell'>Not Provided</td>
+              ) : (
+                <td key={observation.observation_id} className='observation-cell'>{observation.latitude}/{observation.longitude}</td>
+              )}
+              
+            
             <td className='delete-observation-cell'>
               <form onSubmit={(event) => deleteConfirmation(event, observation.observation_id)}>
                 <button type='submit' id='delete-project-button'>Delete</button>
@@ -1253,4 +1260,4 @@ function ProjectResults() {
   )
 }
 
-export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields, EditProject, EditField};
+export {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields, EditProject, EditField };

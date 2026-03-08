@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import './index.css'
-import {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields, EditProject, EditField} from './App.tsx' 
+import {Login, SuccessRedirect, ProjectList, NewProject, ProjectResults, NewFields, EditProject, EditField } from './App.tsx' 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -21,6 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Route path='edit-project/:teacher-id/:project-id' element={<EditProject />} />
 
       <Route path='edit-field/:teacher-id/:project-id/:field-id' element={<EditField />} />
+
     </Routes>
   </BrowserRouter>
 )
