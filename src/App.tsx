@@ -620,7 +620,7 @@ function EditProject() {
   // Remove any blank values
   const cleanData = (data: object) => {
     return Object.fromEntries(
-      Object.entries(data).filter(([_i, value]) => value !== '')
+      Object.entries(data).filter(([_, value]) => value !== '')
     )
   }
 
@@ -725,7 +725,7 @@ function EditField() {
   // Remove any blank values
   const cleanData = (data: object) => {
     return Object.fromEntries(
-      Object.entries(data).filter(([_i, value]) => value !== '')
+      Object.entries(data).filter(([_, value]) => value !== '')
     )
   }
 
