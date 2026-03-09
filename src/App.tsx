@@ -692,7 +692,6 @@ function EditField() {
   const teacherId = idList[0]
   const projectId = idList[1]
   const fieldId = idList[2]
-  console.log(fieldId)
 
   // Store project details
   const [fieldName, setFieldName] = useState('')
@@ -744,7 +743,6 @@ function EditField() {
       alert('Please edit at least one value')
       return
     }
-    console.log(cleanedData)
     try {
       // Send POST request
       fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/fields/${fieldId}`, {
@@ -776,7 +774,6 @@ function EditField() {
   // Delete field
   const deleteProject = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log('click')
 
     try {
       // Send POST request
@@ -900,6 +897,7 @@ function ProjectResults() {
   // Set observation id to be deleted
   const [observationId, setObservationId] = useState('')
 
+  // Get data needed to display content on page
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -923,7 +921,6 @@ function ProjectResults() {
         })
         if (!responseObservations.ok) throw new Error('failed to fetch observations')
         const observationData = await responseObservations.json()
-        //console.log(observationData)
 
         const responseGraphs = await fetch(`https://csafk-277534145495.us-east4.run.app/api/projects/${projectId}/stats`, {
           method: 'GET',
@@ -950,6 +947,8 @@ function ProjectResults() {
       }
     }
     fetchData()
+
+    // Search for optional observations not submitted. Insert a dummy observation set to 'No Data' if an observation doesn't exist where it should've
     const processObservations = () => {
       let tempObject 
       let fieldsContained: number[] = []
@@ -961,12 +960,10 @@ function ProjectResults() {
           }
           
           if (!fieldsContained.includes(projectFields[f].field_id)) {
-            //console.log(projectFields[f].field_id)
             tempObject[o].field_data.push(
               {data_id: '-1', field_id: projectFields[f].field_id, field_value: 'No Data', field_name: ''}
             )
             tempObject[o].field_data.sort((a, b) => a.field_id - b.field_id)
-            //console.log(tempObject)
           }
           fieldsContained = []
         }
@@ -976,7 +973,7 @@ function ProjectResults() {
     }
     processObservations()
     console.log(projectObservations)
-  }, [loaded]); //[loaded, projectId, projectObservations]);
+  }, [loaded]);
   if (!loaded) {
     return (
       <div>
@@ -1169,7 +1166,6 @@ function ProjectResults() {
             <button className='button project-details-button' onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
           </div>
         </div>
-        
       ) : (
       <div>
       <h2>Student Observations</h2>
@@ -1177,7 +1173,6 @@ function ProjectResults() {
         <thead>
           <tr>
             {/*<td>Student</td>*/}
-            
             {projectFields.map((field) => (
             <td key={field.field_id}>
               <a onClick={() => editFieldPage(teacherId, projectId, field.field_id.toString())} id='project-field-link'>{field.field_name}</a>
@@ -1199,8 +1194,6 @@ function ProjectResults() {
               ) : (
                 <td key={observation.observation_id} className='observation-cell'>{observation.latitude}/{observation.longitude}</td>
               )}
-              
-            
             <td className='delete-observation-cell'>
               <form onSubmit={(event) => deleteConfirmation(event, observation.observation_id)}>
                 <button type='submit' id='delete-project-button'>Delete</button>
