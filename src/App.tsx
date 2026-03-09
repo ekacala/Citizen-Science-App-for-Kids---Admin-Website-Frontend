@@ -1154,11 +1154,30 @@ function ProjectResults() {
       <p>Instructions: {projectInstructions}</p>
     </div>
     <div id='project-results'>
+      {projectObservations.length == 0 ? (
+        <div>
+          <h2>You have no observations yet!</h2>
+          <h3>Your field types: </h3>
+          <ul id='project-field-list'>
+            {projectFields.map((field) => (
+              <li id='project-field-link-list' key={field.field_id}>
+                <a onClick={() => editFieldPage(teacherId, projectId, field.field_id.toString())} id='project-field-link'>{field.field_name}</a>
+              </li>
+            ))}
+          </ul>
+          <div id='project-details-button-box'>
+            <button className='button project-details-button' onClick={() => newFieldsPage(teacherId, projectId)}>Add New Fields</button>
+          </div>
+        </div>
+        
+      ) : (
+      <div>
       <h2>Student Observations</h2>
       <table id='project-results-table'>
         <thead>
           <tr>
             {/*<td>Student</td>*/}
+            
             {projectFields.map((field) => (
             <td key={field.field_id}>
               <a onClick={() => editFieldPage(teacherId, projectId, field.field_id.toString())} id='project-field-link'>{field.field_name}</a>
@@ -1196,6 +1215,9 @@ function ProjectResults() {
         <button className='button project-details-button' onClick={buildCharts}>Create Some Graphs</button>
         <button className='button project-details-button' onClick={downloadCSV}>Download Data</button>
       </div>
+      </div>
+      )}
+      
     </div>
     <div id='graph-box' className='hide'>
       <h2 id='graph-box-title'>Graphs</h2>

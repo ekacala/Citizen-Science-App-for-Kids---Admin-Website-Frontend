@@ -396,6 +396,10 @@ input {
   width: 20px;
 }
 
+#field-list-box {
+  display: inline-block;
+}
+
 #project-results-table {
   width: 100%;
   margin: 0 auto;
@@ -414,6 +418,15 @@ input {
 
 #project-field-link:hover {
   cursor: pointer;
+}
+
+#project-field-list {
+  margin: 0 auto 30px auto;
+  width: fit-content;
+}
+
+#project-field-link-list {
+  width: fit-content;
 }
 
 #project-details-button-box {
