@@ -620,8 +620,7 @@ function EditProject() {
   // Remove any blank values
   const cleanData = (data: object) => {
     return Object.fromEntries(
-      // eslint-disable-line no-unused-vars
-      Object.entries(data).filter(([_, value]) => value !== '')
+      Object.entries(data).filter(([_i, value]) => value !== '')
     )
   }
 
@@ -726,8 +725,7 @@ function EditField() {
   // Remove any blank values
   const cleanData = (data: object) => {
     return Object.fromEntries(
-      // eslint-disable-line no-unused-vars
-      Object.entries(data).filter(([_, value]) => value !== '')
+      Object.entries(data).filter(([_i, value]) => value !== '')
     )
   }
 
