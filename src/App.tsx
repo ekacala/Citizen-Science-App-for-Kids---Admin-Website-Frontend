@@ -620,6 +620,7 @@ function EditProject() {
   // Remove any blank values
   const cleanData = (data: object) => {
     return Object.fromEntries(
+      // eslint-disable-line no-unused-vars
       Object.entries(data).filter(([_, value]) => value !== '')
     )
   }
@@ -720,11 +721,12 @@ function EditField() {
         setFieldLabel(fieldArray.field_label)
         setLoaded(true)
       })
-  }, [loaded, fieldId]);
+  }, [loaded, fieldId, projectId]);
 
   // Remove any blank values
   const cleanData = (data: object) => {
     return Object.fromEntries(
+      // eslint-disable-line no-unused-vars
       Object.entries(data).filter(([_, value]) => value !== '')
     )
   }
@@ -820,10 +822,10 @@ function EditField() {
       <p>All information for this field including student observations will be deleted if you do.</p>
       <div id='confirmation-box-button-box'>
         <form onSubmit={(event) => deleteProject(event)}>
-          <button className='confirmation-box-button'>Yes</button>
+          <button className='confirmation-box-button button'>Yes</button>
         </form>
         <form onSubmit={(event) => deleteConfirmation(event)}>
-          <button className='confirmation-box-button'>No</button>
+          <button className='confirmation-box-button button'>No</button>
         </form>
       </div>
     </div>
@@ -950,9 +952,8 @@ function ProjectResults() {
 
     // Search for optional observations not submitted. Insert a dummy observation set to 'No Data' if an observation doesn't exist where it should've
     const processObservations = () => {
-      let tempObject 
       let fieldsContained: number[] = []
-      tempObject = projectObservations
+      const tempObject = projectObservations
       for (const f in projectFields) {
         for (const o in projectObservations) {
           for (const d in projectObservations[o].field_data) {
@@ -973,6 +974,7 @@ function ProjectResults() {
     }
     processObservations()
     console.log(projectObservations)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]);
   if (!loaded) {
     return (
@@ -1026,6 +1028,7 @@ function ProjectResults() {
 
   // Generate line graph
   const buildLineGraph = (lineGraphLabels: any, lineGraphData: any, lineGraphId: string) => {
+    // eslint-disable-next-line prefer-const
     let myChart!: Chart | null
     if (myChart != null) {
       myChart.destroy()
@@ -1090,6 +1093,7 @@ function ProjectResults() {
           graphData.push(graphFields[f].stats.timeline[t].count)
         }
         buildLineGraph(graphLabels, graphData, graphFields[f].field_id.toString())
+        console.log(graphFields)
         graphData = []
         graphLabels = []
         
